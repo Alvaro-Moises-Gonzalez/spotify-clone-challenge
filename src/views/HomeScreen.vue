@@ -16,13 +16,14 @@
 <style scoped>
   .wrapper{
     display: flex;
+    background: linear-gradient()
   }
   .user-info{
     width: auto;
     height: 700px;
     display: flex;
     flex-direction: column;
-    background-color: red;
+    background-color: rgb(18, 35, 56);
   }
   .user-info img{
     width: 200px;
