@@ -4,7 +4,7 @@
   </header>
   <div class="container" >
     <p>Create, share, discover your favorites spotify's tracks and playlist</p>
-    <button>LogIn <img src="../assets/Spotify_Logo_CMYK_White.png" alt="spotify logo"/></button>
+    <router-link :to="{ path: '/callback'}" ><button>LogIn <img src="../assets/Spotify_Logo_CMYK_White.png" alt="spotify logo"/></button></router-link>
   </div>
   <footer>
     <p>Create, share, discover your favorites spotify's tracks and playlist from Spotify</p>

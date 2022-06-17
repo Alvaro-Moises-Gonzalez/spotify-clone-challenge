@@ -1,39 +1,110 @@
 <template>
-    <div class="wrapper">
-        <div class="user-info">
-            <img src="@/assets/placeholder.jpg" alt="foto de perfil" />
-            <button>Inicio</button>
-            <button>Buscar</button>
-            <button>Biblioteca</button>
-        </div>
-        <div>
-            <div class="categories"></div>
-            <div class="playlist"></div>
-        </div>
-    </div>
+  <layout-screen>
+    <template #side>
+      <user-info />
+    </template>
+    <template #upper>
+      <p class="title">Select by Category</p>
+    </template>
+    <template #bottom>
+      <transition-group
+        appear
+        @beforeEnter=beforeEnter
+        @enter=enter
+        >
+        <category-card v-for="category, index in categories" :key="index" :data-index="index" :title="category.title" />
+      </transition-group>
+    </template>
+  </layout-screen>
 </template>
 
+<script>
+import CategoryCard from '@/components/CategoryCard.vue'
+import UserInfo from '@/components/UserInfo.vue'
+import LayoutScreen from '@/Layout/LayoutScreen.vue'
+import gsap from 'gsap'
+
+export default {
+  components: {
+    CategoryCard,
+    UserInfo,
+    LayoutScreen
+  },
+  setup () {
+    const beforeEnter = (el) => {
+      el.style.opacity = 0
+      el.style.transform = 'translateY(100px)'
+    }
+
+    const enter = (el, done) => {
+      gsap.to(el, {
+        opacity: 1,
+        y: 0,
+        duration: 0.8,
+        onComplete: done,
+        delay: el.dataset.index * 0.2
+      })
+    }
+    return { beforeEnter, enter }
+  },
+  data () {
+    return {
+      categories: [
+        {
+          title: 'salsa'
+        },
+        {
+          title: 'rock'
+        },
+        {
+          title: 'cumbia'
+        },
+        {
+          title: 'salsa'
+        },
+        {
+          title: 'rock'
+        },
+        {
+          title: 'cumbia'
+        },
+        {
+          title: 'salsa'
+        },
+        {
+          title: 'rock'
+        },
+        {
+          title: 'cumbia'
+        },
+        {
+          title: 'salsa'
+        },
+        {
+          title: 'rock'
+        },
+        {
+          title: 'cumbia'
+        }
+      ]
+    }
+  }
+}
+</script>
+
 <style scoped>
-.wrapper {
-    display: flex;
-    background: linear-gradient();
-}
-.user-info {
-    width: auto;
-    height: 700px;
-    display: flex;
-    flex-direction: column;
-    background-color: rgb(18, 35, 56);
-}
-.user-info img {
-    width: 200px;
-    height: 200px;
-    border-radius: 50%;
-    margin: 40px;
-}
-.categories {
-    width: 100%;
-    height: 350px;
-    background-color: blue;
+@import url('https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap');
+
+.title{
+  display: inline-block;
+  width: 100%;
+  color: white;
+  text-align: center;
+  background-color: rgba(0,0,0, 0.2);
+  font-size: 4rem;
+  font-family: 'Great Vibes', sans-serif;
+  letter-spacing: 0.5rem;
+  padding: 10px;
+  border-radius: 15px;
 }
 </style>
