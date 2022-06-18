@@ -32,7 +32,7 @@ export default {
     }).then(response => response.json()).then(response => {
       localStorage.setItem('ACCESS_TOKEN', response.access_token)
       localStorage.setItem('EXPIRES', response.expires_in)
-      localStorage.setItem('REFRESH_TOKEN', response.refres_token)
+      localStorage.setItem('REFRESH_TOKEN', response.refresh_token)
       console.log(response)
       this.$router.push({ path: '/home' })
     })
