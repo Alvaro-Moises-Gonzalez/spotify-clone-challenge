@@ -4,7 +4,7 @@
   </header>
   <div class="container" >
     <p>Create, share, discover your favorites spotify's tracks and playlist</p>
-    <router-link :to="{ path: '/callback'}" ><button>LogIn <img src="../assets/Spotify_Logo_CMYK_White.png" alt="spotify logo"/></button></router-link>
+    <button @click=login >LogIn <img src="../assets/Spotify_Logo_CMYK_White.png" alt="spotify logo"/></button>
   </div>
   <footer>
     <p>Create, share, discover your favorites spotify's tracks and playlist from Spotify</p>
@@ -12,8 +12,26 @@
 </template>
 
 <script>
+import { challenge } from '@/utils/sha256'
+import { scopes } from '@/utils/scopesArray'
+import { generateRandomString } from '@/utils/generateRandomString'
 // @ is an alias to /src
-
+export default {
+  setup () {
+    const login = () => {
+      let url = 'https://accounts.spotify.com/authorize?'
+      url += 'response_type=code'
+      url += `&client_id=${process.env.VUE_APP_CLIENT_ID}`
+      url += '&redirect_uri=' + encodeURI(process.env.VUE_APP_REDIRECT_URI)
+      url += `&state="${generateRandomString(16)}"`
+      url += `&scopes="${scopes.join(' ')}"`
+      url += '&code_challenge_method="s256"'
+      url += `&challenge=${challenge}`
+      window.location.href = url
+    }
+    return { login }
+  }
+}
 </script>
 
 <style scoped>

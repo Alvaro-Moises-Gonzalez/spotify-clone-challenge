@@ -8,7 +8,36 @@
 </template>
 
 <script>
+import { verifier } from '@/utils/encode64'
+export default {
+  created () {
+    const query = this.$route.query
+    localStorage.setItem('CODE', query.code)
+    window.history.replaceState({}, document.title, '/')
 
+    fetch('https://accounts.spotify.com/api/token', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
+        Authorization: `Basic ${process.env.VUE_APP_COMBINED_ID_CLIENT}=`
+      },
+      body: new URLSearchParams({
+        grant_type: 'authorization_code',
+        redirect_uri: encodeURI(process.env.VUE_APP_REDIRECT_URI),
+        code: localStorage.getItem('CODE'),
+        code_verifier: verifier,
+        client_id: process.env.VUE_APP_CLIENT_ID
+      }),
+      json: true
+    }).then(response => response.json()).then(response => {
+      localStorage.setItem('ACCESS_TOKEN', response.access_token)
+      localStorage.setItem('EXPIRES', response.expires_in)
+      localStorage.setItem('REFRESH_TOKEN', response.refres_token)
+      console.log(response)
+      this.$router.push({ path: '/home' })
+    })
+  }
+}
 </script>
 
 <style scoped>

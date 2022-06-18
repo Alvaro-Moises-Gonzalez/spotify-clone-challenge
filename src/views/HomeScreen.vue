@@ -30,6 +30,9 @@ export default {
     UserInfo,
     LayoutScreen
   },
+  created () {
+    console.log(localStorage.getItem('ACCESS_TOKEN'))
+  },
   setup () {
     const beforeEnter = (el) => {
       el.style.opacity = 0
