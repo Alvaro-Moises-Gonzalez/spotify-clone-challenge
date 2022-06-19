@@ -1,6 +1,6 @@
 <template>
   <div class="wrapper">
-    <slot name="side"></slot>
+    <user-info />
     <div class="two-piles">
       <div class="upper-container">
         <slot name="upper"></slot>
@@ -12,6 +12,15 @@
     <div class="music-player"></div>
   </div>
 </template>
+
+<script>
+import UserInfo from '@/components/UserInfo.vue'
+export default {
+  components: {
+    UserInfo
+  }
+}
+</script>
 
 <style scoped>
 .wrapper {

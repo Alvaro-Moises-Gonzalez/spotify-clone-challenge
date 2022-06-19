@@ -1,8 +1,5 @@
 <template>
   <layout-screen>
-    <template #side>
-      <user-info />
-    </template>
     <template #upper>
       <p class="title">Select by Category</p>
     </template>
@@ -20,14 +17,12 @@
 
 <script>
 import CategoryCard from '@/components/CategoryCard.vue'
-import UserInfo from '@/components/UserInfo.vue'
 import LayoutScreen from '@/Layout/LayoutScreen.vue'
 import gsap from 'gsap'
 
 export default {
   components: {
     CategoryCard,
-    UserInfo,
     LayoutScreen
   },
   created () {

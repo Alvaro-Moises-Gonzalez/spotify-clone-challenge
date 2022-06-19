@@ -1,8 +1,5 @@
 <template>
 <layout-screen>
-  <template #side>
-    <user-info />
-  </template>
   <template #upper>
     <p>your collection</p>
   </template>
@@ -19,13 +16,11 @@
 
 <script>
 import LayoutScreen from '@/Layout/LayoutScreen.vue'
-import UserInfo from '@/components/UserInfo.vue'
 import CategoryCard from '@/components/CategoryCard.vue'
 import gsap from 'gsap'
 export default {
   components: {
     LayoutScreen,
-    UserInfo,
     CategoryCard
   },
   setup () {

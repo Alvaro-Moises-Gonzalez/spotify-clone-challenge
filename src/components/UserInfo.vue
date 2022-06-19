@@ -6,9 +6,23 @@
             <router-link :to="{ path: '/home' }"><button><span><i class="fa fa-home-alt icon"></i></span>Home</button></router-link>
             <router-link :to="{ path: '/search'}"><button><span><i class="fas fa-search icon"></i></span>Search</button></router-link>
             <router-link :to="{ path: '/playlist'}"><button><span><i class="fas fa-book ico"></i></span>My Playlists</button></router-link>
-            <router-link :to="{ path: '/'}"><button class="logout-btn">Logout</button></router-link>
+            <button class="logout-btn" @click=logout >Logout</button>
         </div>
 </template>
+
+<script>
+export default {
+  methods: {
+    logout () {
+      localStorage.removeItem('CODE')
+      localStorage.removeItem('ACCESS_TOKEN')
+      localStorage.removeItem('EXPiRES')
+      localStorage.removeItem('REFRESH_TOKEN')
+      this.$router.push({ path: '/' })
+    }
+  }
+}
+</script>
 
 <style scoped>
 .user-info {

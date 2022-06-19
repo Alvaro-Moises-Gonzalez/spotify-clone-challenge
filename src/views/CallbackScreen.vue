@@ -29,13 +29,14 @@ export default {
         client_id: process.env.VUE_APP_CLIENT_ID
       }),
       json: true
-    }).then(response => response.json()).then(response => {
-      localStorage.setItem('ACCESS_TOKEN', response.access_token)
-      localStorage.setItem('EXPIRES', response.expires_in)
-      localStorage.setItem('REFRESH_TOKEN', response.refresh_token)
-      console.log(response)
-      this.$router.push({ path: '/home' })
     })
+      .then(response => response.json())
+      .then(response => {
+        localStorage.setItem('ACCESS_TOKEN', response.access_token)
+        localStorage.setItem('EXPIRES', response.expires_in)
+        localStorage.setItem('REFRESH_TOKEN', response.refresh_token)
+        this.$router.push({ path: '/home' })
+      })
   }
 }
 </script>
