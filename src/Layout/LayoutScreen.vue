@@ -1,6 +1,6 @@
 <template>
   <div class="wrapper">
-    <user-info />
+    <user-info :userInfo=userInfo />
     <div class="two-piles">
       <div class="upper-container">
         <slot name="upper"></slot>
@@ -15,9 +15,30 @@
 
 <script>
 import UserInfo from '@/components/UserInfo.vue'
+import { userEndpoints } from '@/api/endpoints'
+import axios from 'axios'
 export default {
   components: {
     UserInfo
+  },
+  data () {
+    return {
+      userInfo: undefined
+    }
+  },
+  created () {
+    (async () => {
+      const config = {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('ACCESS_TOKEN')}`,
+          'Content-type': 'application/json'
+        }
+      }
+      const response = await axios.get(userEndpoints.currentUser, config)
+      const data = await response.data
+      this.userInfo = data
+      localStorage.setItem('COUNTRY', data.country)
+    })()
   }
 }
 </script>

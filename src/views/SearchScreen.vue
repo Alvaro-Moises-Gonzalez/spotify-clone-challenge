@@ -2,8 +2,8 @@
   <layout-screen>
     <template #upper>
       <label>
-        <input type="text" placeholder="Search playlist and tracks...."/>
-      <button><i class="fas fa-search"></i> </button>
+        <input type="text" placeholder="Search playlist, tracks and more...." v-model="value"/>
+      <button @click=fetchSearch ><i class="fas fa-search"></i></button>
     </label>
     </template>
     <template #bottom>
@@ -11,22 +11,71 @@
         appear
         @beforeEnter=beforeEnter
         @enter=enter >
-        <category-card v-for="card, index in 10" :key="index" :data-index="index" />
+        <artist-card v-for="card,index in artists" :key="index" :title="card.name" />
+        <album-card v-for="card,index in albums" :key="index" :title="card.name" />
+        <track-card v-for="card,index in tracks" :key="index" :track='card' />
+        <playlist-card v-for="card,index in playlists" :key="index" :title="card.name" />
+        <show-card v-for="card,index in shows" :key="index" :title="card.name" />
+        <episode-card v-for="card,index in episodes" :key="index" :title="card.name" />
       </transition-group>
     </template>
-
   </layout-screen>
 </template>
 
 <script>
 import LayoutScreen from '@/Layout/LayoutScreen.vue'
-import CategoryCard from '@/components/CategoryCard.vue'
+import ArtistCard from '@/components/ArtistCard.vue'
+import AlbumCard from '@/components/AlbumCard.vue'
+import TrackCard from '@/components/TrackCard.vue'
+import PlaylistCard from '@/components/PlaylistCard.vue'
+import ShowCard from '@/components/ShowCard.vue'
+import EpisodeCard from '@/components/EpisodeCard.vue'
 import gsap from 'gsap'
+import { searchEndpoint } from '@/api/endpoints'
+import axios from 'axios'
 
 export default {
   components: {
     LayoutScreen,
-    CategoryCard
+    ArtistCard,
+    AlbumCard,
+    TrackCard,
+    PlaylistCard,
+    ShowCard,
+    EpisodeCard
+  },
+  data () {
+    return {
+      value: '',
+      albums: [],
+      artists: [],
+      tracks: [],
+      espisodes: [],
+      playlists: [],
+      shows: []
+    }
+  },
+  methods: {
+    fetchSearch () {
+      (async () => {
+        const config = {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('ACCESS_TOKEN')}`,
+            'Content-Type': 'application/json'
+          }
+        }
+        const response = await axios.get(`${searchEndpoint(this.value, 'track,artist,playlist,show,album,episode')}&country=${localStorage.getItem('COUNTRY')}`, config)
+        const data = response.data
+        this.playlists = data.playlists.items
+        this.artists = data.artists.items
+        this.tracks = data.tracks.items
+        this.albums = data.albums.items
+        this.episodes = data.episodes.items
+        this.shows = data.shows.items
+        // console.log(data.albums.items)
+        this.value = ''
+      })()
+    }
   },
   setup () {
     const beforeEnter = (el) => {

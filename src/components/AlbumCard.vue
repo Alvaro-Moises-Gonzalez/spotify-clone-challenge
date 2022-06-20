@@ -1,6 +1,7 @@
 <template>
     <div class="card-container">
-        <p>{{ title }}</p>
+        <p class="title">{{ title }}</p>
+        <p>Type: <strong>Album</strong></p>
     </div>
 </template>
 
@@ -19,11 +20,12 @@ export default {
 .card-container {
     display: flex;
     width: 200px;
-    height: 230px;
+    min-height: 230px;
     border-radius: 15px;
     margin: 20px;
     background-size: contain;
     position: relative;
+    flex-wrap: wrap;
 }
 
 .card-container::before {
@@ -47,7 +49,7 @@ export default {
 .card-container:hover::before {
   cursor: pointer;
   filter: none;
-  border: 1px solid aqua;
+  outline: 3px solid rgb(0, 255, 30);
   opacity: 1;
   z-index: -1;
 }
@@ -55,7 +57,7 @@ export default {
 .card-container p {
     display: block;
     text-align: center;
-    font-size: 2.5rem;
+    font-size: 2rem;
     color: white;
     text-transform: capitalize;
     cursor: pointer;
@@ -64,4 +66,9 @@ export default {
     letter-spacing: 0.2rem;
     margin-left: 35px;
 }
+
+.card-container .title {
+  font-size: 2.3rem;
+}
+
 </style>

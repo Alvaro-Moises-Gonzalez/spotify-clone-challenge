@@ -9,7 +9,7 @@
         @beforeEnter=beforeEnter
         @enter=enter
         >
-        <category-card v-for="category, index in categories" :key="index" :data-index="index" :title="category.title" />
+        <category-card v-for="category, index in categories" :key="index" :data-index="index" :title="category.name" />
       </transition-group>
     </template>
   </layout-screen>
@@ -19,6 +19,8 @@
 import CategoryCard from '@/components/CategoryCard.vue'
 import LayoutScreen from '@/Layout/LayoutScreen.vue'
 import gsap from 'gsap'
+import axios from 'axios'
+import { categoriesEndpoints } from '@/api/endpoints'
 
 export default {
   components: {
@@ -26,65 +28,39 @@ export default {
     LayoutScreen
   },
   created () {
-    console.log(localStorage.getItem('ACCESS_TOKEN'))
+    (async () => {
+      const config = {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('ACCESS_TOKEN')}`,
+          'Content-type': 'application/json'
+        }
+      }
+      const response = await axios.get(`${categoriesEndpoints.getCategories}?country=${localStorage.getItem('COUNTRY')}`, config)
+      const data = await response.data
+      this.categories = data.categories.items
+    })()
   },
   setup () {
     const beforeEnter = (el) => {
-      el.style.opacity = 0
+      el.style.visibility = 'hidden'
       el.style.transform = 'translateY(100px)'
     }
 
     const enter = (el, done) => {
       gsap.to(el, {
-        opacity: 1,
+        autoAlpha: 1,
         y: 0,
         duration: 0.8,
         onComplete: done,
         delay: el.dataset.index * 0.2
       })
     }
+
     return { beforeEnter, enter }
   },
   data () {
     return {
-      categories: [
-        {
-          title: 'salsa'
-        },
-        {
-          title: 'rock'
-        },
-        {
-          title: 'cumbia'
-        },
-        {
-          title: 'salsa'
-        },
-        {
-          title: 'rock'
-        },
-        {
-          title: 'cumbia'
-        },
-        {
-          title: 'salsa'
-        },
-        {
-          title: 'rock'
-        },
-        {
-          title: 'cumbia'
-        },
-        {
-          title: 'salsa'
-        },
-        {
-          title: 'rock'
-        },
-        {
-          title: 'cumbia'
-        }
-      ]
+      categories: []
     }
   }
 }

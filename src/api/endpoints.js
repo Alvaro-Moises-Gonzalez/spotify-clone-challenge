@@ -1,5 +1,5 @@
 // note: in many endpoints it necesary specify user country code on market to get items, as query parameter
-const baseURL = 'https://api.spotify.com'
+const baseURL = 'https://api.spotify.com/v1'
 
 const userEndpoints = {
   currentUser: `${baseURL}/me`,

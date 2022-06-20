@@ -1,8 +1,9 @@
 <template>
    <div class="user-info">
-            <img src="@/assets/placeholder.jpg" alt="foto de perfil" />
-            <p>John Doe</p>
-            <p class="email">john@email.com</p>
+            <img :src="userInfo.images[0].url" alt='foto de perfil' />
+            <p>{{ userInfo.display_name }}</p>
+            <p class="email">{{ userInfo.email }}</p>
+            <p class="country">Country: {{ userInfo.country }}</p>
             <router-link :to="{ path: '/home' }"><button><span><i class="fa fa-home-alt icon"></i></span>Home</button></router-link>
             <router-link :to="{ path: '/search'}"><button><span><i class="fas fa-search icon"></i></span>Search</button></router-link>
             <router-link :to="{ path: '/playlist'}"><button><span><i class="fas fa-book ico"></i></span>My Playlists</button></router-link>
@@ -16,9 +17,22 @@ export default {
     logout () {
       localStorage.removeItem('CODE')
       localStorage.removeItem('ACCESS_TOKEN')
-      localStorage.removeItem('EXPiRES')
+      localStorage.removeItem('EXPIRES')
       localStorage.removeItem('REFRESH_TOKEN')
       this.$router.push({ path: '/' })
+    }
+  },
+  props: {
+    userInfo: {
+      type: Object,
+      default (rawProps) {
+        return {
+          images: ['@/assets/placeholder.jpg'],
+          email: '',
+          country: '',
+          display_name: ''
+        }
+      }
     }
   }
 }
@@ -34,20 +48,27 @@ export default {
     position: relative;
 }
 .user-info img {
-    width: 200px;
-    height: 200px;
+    width: 220px;
+    height: 230px;
     border-radius: 50%;
-    margin: 40px;
+    margin: 20px;
+    background-size: contain;
 }
 .user-info p{
   color: white;
   text-align: center;
   font-size: 3rem;
-  margin: 20px 0px;
+  margin: 10px 0px;
 }
 .user-info .email{
   font-size: 1.5rem;
-  margin: 5px 0px 15px 0px;
+  margin: 5px 0px 5px 0px;
+}
+
+.user-info .country {
+  font-size: 1.5rem;
+  text-align: left;
+  margin-left: 35px;
 }
 
 button {

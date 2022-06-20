@@ -13,8 +13,8 @@
 
 <script>
 import { challenge } from '@/utils/sha256'
-import { scopes } from '@/utils/scopesArray'
 import { generateRandomString } from '@/utils/generateRandomString'
+import { scopes } from '@/utils/scopesArray'
 // @ is an alias to /src
 export default {
   setup () {
@@ -24,7 +24,7 @@ export default {
       url += `&client_id=${process.env.VUE_APP_CLIENT_ID}`
       url += '&redirect_uri=' + encodeURI(process.env.VUE_APP_REDIRECT_URI)
       url += `&state="${generateRandomString(16)}"`
-      url += `&scopes="${scopes.join(' ')}"`
+      url += `&scope=${encodeURIComponent(scopes.join(' '))}`
       url += '&code_challenge_method="s256"'
       url += `&challenge=${challenge}`
       window.location.href = url
