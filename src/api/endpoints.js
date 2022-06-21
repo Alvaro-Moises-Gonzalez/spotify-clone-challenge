@@ -6,7 +6,7 @@ const userEndpoints = {
   getUserTopItems: (type) => `${baseURL}/me/top/${type}`,
   getUserProfile: (userID) => `${baseURL}/users/${userID}`,
   putFollowPlaylist: (playlistID) => `${baseURL}/playlist/${playlistID}/followers`,
-  unollowPlaylist: (playlistID) => `${baseURL}/playlist/${playlistID}/followers`,
+  unfollowPlaylist: (playlistID) => `${baseURL}/playlist/${playlistID}/followers`,
   getFollowedArtists: (limit) => `${baseURL}/me/following?type=artist&limit=${limit}`,
   followArtistUsers: `${baseURL}/me/following`, // request type put
   unfollowArtistUsers: `${baseURL}/me/following` // request type delete
@@ -62,6 +62,16 @@ const tracksEndpoints = {
   getRecomendedTracks: `${baseURL}/recommendations`
 }
 
+const playlistEndpoints = {
+  userPlaylists: `${baseURL}/me/playlists`,
+  getPlaylistFromUser: (userid) => `${baseURL}/playlist/${userid}?country=${localStorage.getItem('COUNTRY')}`,
+  modifyUserPlaylist: (playlistid) => `${baseURL}/playlist/${playlistid}?country=${localStorage.getItem('COUNTRY')}`,
+  getPlaylistTracks: (playlistid) => `${baseURL}/playlist/${playlistid}/tracks?country=${localStorage.getItem('COUNTRY')}
+  `,
+  addTrackToPlaylist: (playlistid) => `${baseURL}/playlist/${playlistid}/tracks?country=${localStorage.getItem('COUNTRY')}`,
+  getPlaylistFromCategories: (categoryId) => `${baseURL}/browse/categories/${categoryId}/playlists?country${localStorage.getItem('COUNTRY')}`
+}
+
 const searchEndpoint = (string, array) => `${baseURL}/search?q=${string}&type=${array}`
 export {
   userEndpoints,
@@ -71,5 +81,6 @@ export {
   artistEndpoints,
   showsEndpoints,
   episodesEndpoints,
-  tracksEndpoints
+  tracksEndpoints,
+  playlistEndpoints
 }

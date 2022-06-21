@@ -4,6 +4,7 @@ import CallbackScreen from '../views/CallbackScreen.vue'
 import HomeScreen from '../views/HomeScreen.vue'
 import SearchScreen from '@/views/SearchScreen.vue'
 import UserPlaylist from '@/views/UserPlaylist.vue'
+import CategoryDetails from '@/views/CategoryDetails.vue'
 
 const routes = [
   {
@@ -30,6 +31,11 @@ const routes = [
     path: '/playlist',
     name: 'playlist',
     component: UserPlaylist
+  },
+  {
+    path: '/category-details/:id',
+    name: 'category details',
+    component: CategoryDetails
   }
 ]
 

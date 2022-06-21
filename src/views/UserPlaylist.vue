@@ -8,7 +8,7 @@
       appear
       @beforeEnter=beforeEnter
       @enter=enter >
-      <category-card  v-for="card, index in 10" :key="index" :data-index="index"/>
+      <playlist-card  v-for="playlist, index in userPlaylists" :key="index" :data-index="index" :playlist="playlist"/>
     </transition-group>
   </template>
 </layout-screen>
@@ -16,19 +16,26 @@
 
 <script>
 import LayoutScreen from '@/Layout/LayoutScreen.vue'
-import CategoryCard from '@/components/CategoryCard.vue'
+import PlaylistCard from '@/components/PlaylistCard.vue'
+import axios from 'axios'
+import { playlistEndpoints } from '@/api/endpoints'
 import gsap from 'gsap'
 export default {
   components: {
     LayoutScreen,
-    CategoryCard
+    PlaylistCard
   },
-  setup () {
-    const beforeEnter = (el) => {
+  data () {
+    return {
+      userPlaylists: []
+    }
+  },
+  methods: {
+    beforeEnter (el) {
       el.style.opacity = 0
       el.style.transform = 'translateY(100px)'
-    }
-    const enter = (el, done) => {
+    },
+    enter (el, done) {
       gsap.to(el, {
         opacity: 1,
         y: 0,
@@ -37,7 +44,19 @@ export default {
         delay: el.dataset.index * 0.2
       })
     }
-    return { beforeEnter, enter }
+  },
+  created () {
+    (async () => {
+      const config = {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('ACCESS_TOKEN')}`,
+          'Content-Type': 'application/json'
+        }
+      }
+      const response = await axios.get(`${playlistEndpoints.userPlaylists}`, config)
+      const data = response.data
+      this.userPlaylists = data.items
+    })()
   }
 }
 </script>

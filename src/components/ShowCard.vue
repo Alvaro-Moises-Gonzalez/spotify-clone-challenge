@@ -1,6 +1,7 @@
 <template>
     <div class="card-container">
-        <p class="title">{{ title }}</p>
+        <p class="title">{{ show.name }}</p>
+        <p class="author"><strong>Author: {{ show.publisher }}</strong></p>
         <p>Type: <strong>Show</strong></p>
     </div>
 </template>
@@ -8,9 +9,14 @@
 <script>
 export default {
   props: {
-    title: {
-      type: String,
-      default: 'Category name'
+    show: {
+      type: Object,
+      default (rawProps) {
+        return {
+          publisher: 'author',
+          name: 'show name'
+        }
+      }
     }
   }
 }
@@ -19,13 +25,15 @@ export default {
 <style scoped>
 .card-container {
     display: flex;
-    width: 200px;
-    height: 230px;
+    width: 280px;
+    height: auto;
     border-radius: 15px;
     margin: 20px;
     background-size: contain;
     position: relative;
     flex-wrap: wrap;
+    justify-content: center;
+    align-content: center;
 }
 
 .card-container::before {
@@ -55,16 +63,14 @@ export default {
 }
 
 .card-container p {
-    display: block;
     text-align: center;
     font-size: 2rem;
     color: white;
     text-transform: capitalize;
     cursor: pointer;
-    place-self: center;
-    padding-right: 50px;
     letter-spacing: 0.2rem;
-    margin-left: 35px;
+    margin: 10px 0;
+    padding: 0 20px;
 }
 
 .card-container .title {

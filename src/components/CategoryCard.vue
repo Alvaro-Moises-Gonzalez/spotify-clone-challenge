@@ -1,15 +1,30 @@
 <template>
-    <div class="card-container">
-        <p>{{ title }}</p>
+    <div class="card-container" @click=goToDetails>
+        <p>{{ category.name }}</p>
     </div>
 </template>
 
 <script>
 export default {
   props: {
-    title: {
-      type: String,
-      default: 'Category name'
+    category: {
+      type: Object,
+      default (rawProps) {
+        return {
+          name: '',
+          id: ''
+        }
+      }
+    }
+  },
+  methods: {
+    goToDetails () {
+      this.$router.push({ name: 'category details', params: { id: this.id } })
+    }
+  },
+  data () {
+    return {
+      id: this.category.id
     }
   }
 }
@@ -18,12 +33,14 @@ export default {
 <style scoped>
 .card-container {
     display: flex;
-    width: 200px;
+    width: 250px;
     height: 230px;
     border-radius: 15px;
     margin: 20px;
     background-size: contain;
     position: relative;
+    align-content: center;
+    justify-content: center;
 }
 
 .card-container::before {
@@ -59,9 +76,8 @@ export default {
     color: white;
     text-transform: capitalize;
     cursor: pointer;
-    place-self: center;
-    padding-right: 50px;
+    align-self: center;
     letter-spacing: 0.2rem;
-    margin-left: 35px;
+    justify-self: center;
 }
 </style>

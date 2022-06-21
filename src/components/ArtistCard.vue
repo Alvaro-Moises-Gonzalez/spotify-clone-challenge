@@ -19,13 +19,15 @@ export default {
 <style scoped>
 .card-container {
     display: flex;
-    width: 200px;
+    width: 280px;
     height: 230px;
     border-radius: 15px;
     margin: 20px;
     background-size: contain;
     position: relative;
     flex-wrap: wrap;
+    align-content: center;
+    justify-content: center;
 }
 
 .card-container::before {
@@ -61,7 +63,6 @@ export default {
     color: white;
     text-transform: capitalize;
     cursor: pointer;
-    place-self: center;
     padding-right: 50px;
     letter-spacing: 0.2rem;
     margin-left: 35px;
@@ -69,6 +70,7 @@ export default {
 
 .card-container .title {
   font-size: 2.3rem;
+  margin-bottom: 5px;
 }
 
 </style>

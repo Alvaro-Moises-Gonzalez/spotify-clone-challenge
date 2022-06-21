@@ -1,6 +1,7 @@
 <template>
     <div class="card-container">
-        <p class="title">{{ title }}</p>
+        <p class="title">{{ album.name }}</p>
+        <p>Artist: {{ album.artists[0]['name'] }}</p>
         <p>Type: <strong>Album</strong></p>
     </div>
 </template>
@@ -8,9 +9,16 @@
 <script>
 export default {
   props: {
-    title: {
-      type: String,
-      default: 'Category name'
+    album: {
+      type: Object,
+      default (rawProps) {
+        return {
+          name: 'album name',
+          artists: [{
+            name: 'artist name'
+          }]
+        }
+      }
     }
   }
 }
@@ -19,13 +27,15 @@ export default {
 <style scoped>
 .card-container {
     display: flex;
-    width: 200px;
+    width: 280px;
     min-height: 230px;
     border-radius: 15px;
     margin: 20px;
     background-size: contain;
     position: relative;
     flex-wrap: wrap;
+    align-content: center;
+    justify-content: center;
 }
 
 .card-container::before {
@@ -61,10 +71,9 @@ export default {
     color: white;
     text-transform: capitalize;
     cursor: pointer;
-    place-self: center;
-    padding-right: 50px;
     letter-spacing: 0.2rem;
-    margin-left: 35px;
+    margin: 10px 0;
+    padding: 0px 20px;
 }
 
 .card-container .title {

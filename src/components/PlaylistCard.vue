@@ -1,16 +1,47 @@
 <template>
-    <div class="card-container">
-        <p class="title">{{ title }}</p>
-        <p>Type: <strong>Playlist</strong></p>
+    <div class="card-container" >
+        <img v-if="src" class="playlist-image" :src="src" alt="Playlist image"/>
+        <img v-else class="playlist-image" src="@/assets/album-placeholder.jpg" alt="Playlist image"/>
+        <div class="info-container">
+          <p class="title">{{ playlist.name }}</p>
+          <p class="owner">Owner: <strong>{{ playlist.owner.display_name }}</strong></p>
+        </div>
     </div>
 </template>
 
 <script>
 export default {
   props: {
-    title: {
-      type: String,
-      default: 'Category name'
+    playlist: {
+      type: Object,
+      default (rawProps) {
+        return {
+          name: '',
+          images: ['@/assets/placeholder.jpg'],
+          owner: {
+            name: ''
+          },
+          id: ''
+        }
+      }
+    }
+  },
+  data () {
+    return {
+      id: this.playlist.id,
+      src: undefined
+    }
+  },
+  methods: {
+    goToDetails () {
+      this.$router.push({ path: '/playlist/details/:id', params: { id: this.id } })
+    }
+  },
+  created () {
+    if (this.playlist.images[0]) {
+      this.src = this.playlist.images[0].url
+    } else {
+      this.src = false
     }
   }
 }
@@ -19,13 +50,15 @@ export default {
 <style scoped>
 .card-container {
     display: flex;
-    width: 200px;
-    height: 230px;
+    min-width: 280px;
+    height: auto;
     border-radius: 15px;
     margin: 20px;
     background-size: contain;
     position: relative;
-    flex-wrap: wrap;
+    justify-content: center;
+    align-content: center;
+    flex-direction: column;
 }
 
 .card-container::before {
@@ -54,21 +87,34 @@ export default {
   z-index: -1;
 }
 
-.card-container p {
-    display: block;
-    text-align: center;
-    font-size: 2rem;
-    color: white;
-    text-transform: capitalize;
-    cursor: pointer;
-    place-self: center;
-    padding-right: 50px;
-    letter-spacing: 0.2rem;
-    margin-left: 35px;
+.playlist-image{
+  width: 180px;
+  height: 180px;
+  place-self: center;
+  margin: 10px;
+  border-radius: 15px;
 }
 
-.card-container .title {
+.info-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-items: center;
+  color: white;
+  font-size: 2rem;
+}
+
+.info-container .title {
+  max-width: 200px;
+  text-align: center;
   font-size: 2.3rem;
+}
+
+.info-container .owner {
+  max-width: 200px;
+  text-overflow: '...';
+  text-align: center;
+  margin: 10px 0;
 }
 
 </style>
