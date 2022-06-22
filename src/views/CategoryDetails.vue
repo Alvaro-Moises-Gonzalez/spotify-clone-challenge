@@ -2,7 +2,7 @@
   <layout-details>
     <template #upper>
       <img :src="src"  alt="category"/>
-      <p>Title: {{ title }}</p>
+      <p>Category: {{ title }}</p>
     </template>
     <template #bottom>
       <transition-group
@@ -11,6 +11,7 @@
       @enter=enter >
         <p v-if="items">There no are playlists for this category</p>
         <playlist-card v-else v-for="playlist, index in playlists" :key="index" :playlist="playlist" />
+        <button class="load-btn" v-if="loadMore" @click=nextLoad > More playlist</button>
       </transition-group>
     </template>
   </layout-details>
@@ -40,6 +41,24 @@ export default {
         onComplete: done,
         delay: el.dataset.index * 0.2
       })
+    },
+    nextLoad () {
+      (async () => {
+        const config = {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('ACCESS_TOKEN')}`,
+            'Content-Type': 'application/json'
+          }
+        }
+        const response = await axios.get(this.next, config)
+        const data = response.data
+        if (data.playlists.next) {
+          this.next = data.playlists.next
+        } else {
+          this.loadMore = false
+        }
+        this.playlists = [...this.playlists, ...data.playlists.items]
+      })()
     }
   },
   created () {
@@ -59,10 +78,12 @@ export default {
       const dataPlaylist = playlistResponse.data
       if (dataPlaylist.playlists.items.length) {
         this.playlists = dataPlaylist.playlists.items
+        this.loadMore = true
       } else {
         this.items = true
       }
-      this.next = dataPlaylist.next
+      this.next = dataPlaylist.playlists.next
+      console.log(dataPlaylist)
     })()
   },
   data () {
@@ -72,7 +93,8 @@ export default {
       playlists: undefined,
       categoryId: this.$route.params.id,
       next: undefined,
-      items: undefined
+      items: undefined,
+      loadMore: false
     }
   }
 }
@@ -90,5 +112,21 @@ p {
   font-size: 4rem;
   align-self: center;
   justify-self: center;
+  margin-left: 20px;
+}
+
+.load-btn {
+  width: 100px;
+  height: 100px;
+  background: rgba(0,0,0, 0.4);
+  border-radius: 15px;
+  border: none;
+  color: white;
+  font-size: 2rem;
+  margin: 30px;
+}
+.load-btn:hover {
+  outline: 2px solid aqua;
+  color: aqua;
 }
 </style>

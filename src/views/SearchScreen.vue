@@ -216,7 +216,6 @@ export default {
           this.loadMoreArtist = false
         }
         this.artists = [...this.artists, ...data.artists.items]
-        console.log(data)
       })()
     },
     nextTrack () {

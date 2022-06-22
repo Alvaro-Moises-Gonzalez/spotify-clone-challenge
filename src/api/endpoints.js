@@ -69,7 +69,8 @@ const playlistEndpoints = {
   getPlaylistTracks: (playlistid) => `${baseURL}/playlist/${playlistid}/tracks?country=${localStorage.getItem('COUNTRY')}
   `,
   addTrackToPlaylist: (playlistid) => `${baseURL}/playlist/${playlistid}/tracks?country=${localStorage.getItem('COUNTRY')}`,
-  getPlaylistFromCategories: (categoryId) => `${baseURL}/browse/categories/${categoryId}/playlists?country${localStorage.getItem('COUNTRY')}`
+  getPlaylistFromCategories: (categoryId) => `${baseURL}/browse/categories/${categoryId}/playlists?country${localStorage.getItem('COUNTRY')}`,
+  getPlaylist: (playlistid) => `${baseURL}/playlists/${playlistid}?country=${localStorage.getItem('COUNTRY')}`
 }
 
 const searchEndpoint = (string, array) => `${baseURL}/search?q=${string}&type=${array}`

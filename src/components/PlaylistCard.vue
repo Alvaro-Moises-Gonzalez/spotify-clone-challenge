@@ -1,5 +1,5 @@
 <template>
-    <div class="card-container" >
+    <div class="card-container" @click=goToDetails>
         <img v-if="src" class="playlist-image" :src="src" alt="Playlist image"/>
         <img v-else class="playlist-image" src="@/assets/album-placeholder.jpg" alt="Playlist image"/>
         <div class="info-container">
@@ -34,7 +34,7 @@ export default {
   },
   methods: {
     goToDetails () {
-      this.$router.push({ path: '/playlist/details/:id', params: { id: this.id } })
+      this.$router.push({ name: 'playlist details', params: { id: this.id } })
     }
   },
   created () {
