@@ -3,10 +3,10 @@
     <img v-if="source" :src="source" alt="disk's Art" />
     <img v-else src="@/assets/album-placeholder.jpg" alt="cover art" />
     <div class="thumbnail-info">
-      <p class="title">{{ playlist.name }}</p>
-      <p class="author">{{ playlist.owner.display_name }}</p>
-      <p class="number">{{ playlist.tracks.total }} Tracks</p>
-      <p class="description">{{ playlist.description }}</p>
+      <p class="title">{{ playlist1.name }}</p>
+      <p class="author">{{ playlist1.owner.display_name }}</p>
+      <p class="number">{{ playlist1.tracks.total }} Tracks</p>
+      <p class="description">{{ playlist1.description }}</p>
     </div>
   </div>
 </template>
@@ -14,7 +14,7 @@
 <script>
 export default {
   props: {
-    playlist: {
+    playlist1: {
       type: Object,
       default(rawProps) {
         return {

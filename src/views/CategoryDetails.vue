@@ -82,8 +82,12 @@ export default {
       } else {
         this.items = true
       }
-      this.next = dataPlaylist.playlists.next
-      console.log(dataPlaylist)
+
+    if (dataPlaylist.playlists.next) {
+        this.next = dataPlaylist.playlists.next
+    } else {
+        this.loadMore = false
+    }
     })()
   },
   data () {

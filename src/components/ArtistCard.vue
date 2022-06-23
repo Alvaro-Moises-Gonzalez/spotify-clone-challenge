@@ -1,16 +1,33 @@
 <template>
     <div class="card-container">
-        <p class="title">{{ title }}</p>
-        <p>Type: <strong>Artist</strong></p>
+        <img v-if="src" :src="src" :alt="artist.name" />
+        <img v-else src="@/assets/artist-placeholder.jpg" :alt="artist.name" />
+        <p><strong>{{ artist.name }}</strong></p>
     </div>
 </template>
 
 <script>
 export default {
   props: {
-    title: {
-      type: String,
-      default: 'Category name'
+    artist: {
+      type: Object,
+      default (rawProps) {
+        return {
+            name: '',
+            id: '',
+            images: ['@/assets/album-placeholdder.jpg']
+        }
+      }
+    }
+  },
+  data () {
+    return {
+        src: undefined
+    }
+  },
+  created () {
+    if (this.artist.images[0]) {
+        this.src = this.artist.images[0].url
     }
   }
 }
@@ -18,16 +35,16 @@ export default {
 
 <style scoped>
 .card-container {
-    display: flex;
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: 2fr 1fr;
     width: 280px;
     height: 230px;
     border-radius: 15px;
     margin: 20px;
     background-size: contain;
     position: relative;
-    flex-wrap: wrap;
-    align-content: center;
-    justify-content: center;
+   place-items: center center;
 }
 
 .card-container::before {
@@ -68,9 +85,10 @@ export default {
     margin-left: 35px;
 }
 
-.card-container .title {
-  font-size: 2.3rem;
-  margin-bottom: 5px;
+img {
+    width: 180px;
+    height: 180px;
+    margin-top: 10px;
+    border-radius: 15px;
 }
-
 </style>

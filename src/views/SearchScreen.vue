@@ -19,7 +19,7 @@
         appear
         @beforeEnter=beforeEnter
         @enter=enter >
-        <artist-card v-for="card,index in artists" :key="index" :title="card.name" />
+        <artist-card v-for="artist,index in artists" :key="index" :artist="artist" />
         <album-card v-for="album,index in albums" :key="index" :album="album" />
         <track-card v-for="card,index in tracks" :key="index" :track='card' />
         <playlist-card v-for="playlist,index in playlists" :key="index" :playlist="playlist" />
@@ -126,6 +126,7 @@ export default {
           this.albums = []
           this.shows = []
           this.episodes = []
+          console.log(data.artists)
         }
         if (data.tracks) {
           this.tracks = data.tracks.items
@@ -332,7 +333,7 @@ export default {
 
 <style scoped>
 input{
-  width: 800px;
+  min-width: 80%;
   height: 40px;
   border: none;
   outline: none;

@@ -1,13 +1,15 @@
 <template>
   <playlist-details-layout>
     <template #upper-block>
-      <playlist-thumbnail :playlist="playlist" :source="source" />
+      <playlist-thumbnail :playlist1="playlist" :source="source" />
     </template>
     <template #rows>
       <track-row
-        v-for="(track, index) in 74"
+        v-for="(track, index) in tracks"
         :key="index"
         :data-index="index"
+        :track="track"
+        :trackNumber="index + 1"
       />
     </template>
   </playlist-details-layout>
@@ -39,17 +41,20 @@ export default {
     )
     const playlistData = playlistResponse.data
     this.playlist = playlistData
-    console.log('playlistData', playlistData.images.length)
+    console.log(playlistData.tracks.items)
     if (playlistData.images) {
       this.source = playlistData.images[0].url
     } else {
       this.source = '@/assets/album-placeholder.jpg'
     }
+    const tracksArray = playlistData.tracks.items
+    this.tracks = tracksArray
   },
   data() {
     return {
       playlist: undefined,
-      source: undefined
+      source: undefined,
+      tracks: undefined
     }
   }
 }
