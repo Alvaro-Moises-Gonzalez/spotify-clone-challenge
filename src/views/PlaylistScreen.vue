@@ -25,7 +25,7 @@ export default {
     PlaylistThumbnail,
     TrackRow
   },
-  async created () {
+  async created() {
     const id = this.$route.params.id
     const config = {
       headers: {
@@ -39,15 +39,14 @@ export default {
     )
     const playlistData = playlistResponse.data
     this.playlist = playlistData
-    console.log(playlistData)
-    console.log(playlistData.images[0])
-    if (playlistData.images[0]) {
+    console.log('playlistData', playlistData.images.length)
+    if (playlistData.images) {
       this.source = playlistData.images[0].url
     } else {
       this.source = '@/assets/album-placeholder.jpg'
     }
   },
-  data () {
+  data() {
     return {
       playlist: undefined,
       source: undefined
