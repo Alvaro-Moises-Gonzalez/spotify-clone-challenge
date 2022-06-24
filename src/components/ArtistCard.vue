@@ -1,5 +1,5 @@
 <template>
-    <div class="card-container">
+    <div class="card-container" @click=goToArtistDetail>
         <img v-if="src" :src="src" :alt="artist.name" />
         <img v-else src="@/assets/artist-placeholder.jpg" :alt="artist.name" />
         <p><strong>{{ artist.name }}</strong></p>
@@ -28,6 +28,11 @@ export default {
   created () {
     if (this.artist.images[0]) {
         this.src = this.artist.images[0].url
+    }
+  },
+  methods: {
+    goToArtistDetail () {
+        this.$router.push({ name: 'artist details', params: { id: this.artist.id}})
     }
   }
 }

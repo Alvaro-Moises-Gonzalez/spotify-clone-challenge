@@ -59,7 +59,6 @@ export default {
   gap: 10px;
 }
 .two-piles {
-  grid-column: span;
   display: flex;
   flex-direction: column;
   gap: 5px;
