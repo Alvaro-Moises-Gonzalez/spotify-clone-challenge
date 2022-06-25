@@ -7,6 +7,7 @@
       <div class="upper-container">
         <slot name="upper"></slot>
       </div>
+      <p>Episodes</p>
       <div class="bottom-container">
         <slot name="bottom"></slot>
       </div>
@@ -14,41 +15,42 @@
   </div>
 </template>
 
-
 <style scoped>
 .wrapper {
   display: grid;
-  grid-template-columns: 1fr 3fr;
-  grid-template-rows: 1fr;
-  background: linear-gradient(
-      180deg,
-      rgba(2, 0, 36, 0.8) 0%,
-      rgba(10, 10, 68, 0.2) 41%,
-      rgba(154, 0, 255, 0.1) 100%
-    ),
-    url('../assets/home-background.jpg');
-  background-attachment: fixed;
+  grid-template: 1fr / 1fr 3fr;
+  background: linear-gradient(rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.2)),
+    url('@/assets/show-background.jpg');
   background-size: cover;
   background-repeat: no-repeat;
+  background-attachment: fixed;
   gap: 10px;
+}
+
+.sideBar {
+  grid-row: 1 / 3;
 }
 .two-piles {
   display: flex;
   flex-direction: column;
-  gap: 5px;
 }
 .upper-container {
-  margin: 10px 0;
+  margin: 0 10px;
+  height: auto;
 }
 .bottom-container {
   display: flex;
   flex-wrap: wrap;
   background: rgba(0, 0, 0, 0.2);
-  min-width: 75vw;
-  height: 85vh;
-  margin-right: 10px;
+  max-width: 75vw;
+  max-height: 60vh;
+  margin: 0px 10px;
   border-radius: 15px;
   overflow-y: scroll;
-  justify-content: center;
 }
+ p{
+    font-size: 2.5rem;
+    margin: 10px 10px;
+    color: white;
+ }
 </style>

@@ -1,5 +1,8 @@
 <template>
   <playlist-details-layout>
+    <template #aside>
+        <user-info :userInfo="userInfo" />
+    </template>
     <template #upper-block>
       <playlist-thumbnail :playlist1="playlist" :source="source" />
     </template>
@@ -19,22 +22,21 @@
 import PlaylistDetailsLayout from '@/Layout/PlaylistDetailsLayout.vue'
 import PlaylistThumbnail from '@/components/PlaylistThumbnail.vue'
 import TrackRow from '@/components/TrackRow.vue'
+import UserInfo from '@/components/UserInfo.vue'
 import axios from 'axios'
-import { playlistEndpoints } from '@/api/endpoints'
+import { playlistEndpoints, userEndpoints } from '@/api/endpoints'
+import { config } from '@/api/config'
 export default {
   components: {
     PlaylistDetailsLayout,
     PlaylistThumbnail,
-    TrackRow
+    TrackRow,
+    UserInfo
   },
   async created() {
     const id = this.$route.params.id
-    const config = {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem('ACCESS_TOKEN')}`,
-        'Content-Type': 'application/json'
-      }
-    }
+    const userInfoRespónse = await axios.get(userEndpoints.currentUser, config)
+    this.userInfo = userInfoRespónse.data
     const playlistResponse = await axios.get(
       playlistEndpoints.getPlaylist(id),
       config
@@ -54,7 +56,8 @@ export default {
     return {
       playlist: undefined,
       source: undefined,
-      tracks: undefined
+      tracks: undefined,
+      userInfo: undefined
     }
   }
 }

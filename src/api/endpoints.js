@@ -27,9 +27,9 @@ const categoriesEndpoints = {
 }
 
 const albumsEndpoints = {
-  getAlbum: (id, market) => `${baseURL}/albums/${id}?market=${market}`,
+  getAlbum: (id) => `${baseURL}/albums/${id}?country=${localStorage.getItem('COUNTRY')}`,
   getAlbums: `${baseURL}/albums`, // queries ids, market
-  getAlbumTracks: (id, limit, market, offset) => `${baseURL}/albums/${id}/tracks?limit=${limit}&market=${market}&offset=${offset}`,
+  getAlbumTracks: (id) => `${baseURL}/albums/${id}/tracks?country=${localStorage.getItem('COUNTRY')}`,
   getSavedAlbums: `${baseURL}/me/albums`,
   putSaveAlbums: `${baseURL}/me/albums`,
   deleteRemoveAlbum: `${baseURL}/me/albums`,

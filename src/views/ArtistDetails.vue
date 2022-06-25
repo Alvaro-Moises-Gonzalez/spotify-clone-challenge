@@ -72,7 +72,6 @@ export default {
     }
   },
   async created() {
-    console.log(localStorage.getItem('ACCESS_TOKEN'))
     const id = this.$route.params.id
     const userResponse = await axios.get(userEndpoints.currentUser, config)
     this.userInfo = userResponse.data
@@ -91,6 +90,7 @@ export default {
       config
     )
     this.albums = artistAlbumsResponse.data.items
+    console.log(artistAlbumsResponse.data.items)
     if (artistAlbumsResponse.data.next) {
       this.next = artistAlbumsResponse.data.next
     }

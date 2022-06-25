@@ -1,41 +1,50 @@
 <template>
-<layout-screen>
-  <template #upper>
-    <p>your collection</p>
-  </template>
-  <template #bottom>
-    <transition-group
-      appear
-      @beforeEnter=beforeEnter
-      @enter=enter >
-      <playlist-card  v-for="playlist, index in userPlaylists" :key="index" :data-index="index" :playlist="playlist"/>
-    </transition-group>
-  </template>
-</layout-screen>
+  <layout-screen>
+    <template #aside>
+      <user-info :userInfo="userInfo" />
+    </template>
+    <template #upper>
+      <p>your collection</p>
+    </template>
+    <template #bottom>
+      <transition-group appear @beforeEnter="beforeEnter" @enter="enter">
+        <playlist-card
+          v-for="(playlist, index) in userPlaylists"
+          :key="index"
+          :data-index="index"
+          :playlist="playlist"
+        />
+      </transition-group>
+    </template>
+  </layout-screen>
 </template>
 
 <script>
 import LayoutScreen from '@/Layout/LayoutScreen.vue'
 import PlaylistCard from '@/components/PlaylistCard.vue'
+import UserInfo from '@/components/UserInfo.vue'
 import axios from 'axios'
-import { playlistEndpoints } from '@/api/endpoints'
+import { playlistEndpoints, userEndpoints } from '@/api/endpoints'
+import { config } from '@/api/config'
 import gsap from 'gsap'
 export default {
   components: {
     LayoutScreen,
-    PlaylistCard
+    PlaylistCard,
+    UserInfo
   },
-  data () {
+  data() {
     return {
-      userPlaylists: []
+      userPlaylists: [],
+      userInfo: undefined
     }
   },
   methods: {
-    beforeEnter (el) {
+    beforeEnter(el) {
       el.style.opacity = 0
       el.style.transform = 'translateY(100px)'
     },
-    enter (el, done) {
+    enter(el, done) {
       gsap.to(el, {
         opacity: 1,
         y: 0,
@@ -45,25 +54,23 @@ export default {
       })
     }
   },
-  created () {
-    (async () => {
-      const config = {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('ACCESS_TOKEN')}`,
-          'Content-Type': 'application/json'
-        }
-      }
-      const response = await axios.get(`${playlistEndpoints.userPlaylists}`, config)
-      const data = response.data
-      this.userPlaylists = data.items
-    })()
+  async created() {
+
+    const userInfoResponse = await axios.get(userEndpoints.currentUser, config)
+    this.userInfo = userInfoResponse.data
+    const playlistResponse = await axios.get(
+      playlistEndpoints.userPlaylists,
+      config
+    )
+    const playlistData = playlistResponse.data
+    this.userPlaylists = playlistData.items
   }
 }
 </script>
 
 <style scoped>
 @import url('https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap');
-p{
+p {
   color: white;
   font-size: 4rem;
   text-transform: capitalize;

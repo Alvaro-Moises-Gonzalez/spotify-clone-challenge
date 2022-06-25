@@ -10,12 +10,12 @@
 <script>
 import { verifier } from '@/utils/encode64'
 export default {
-  created () {
+  async created () {
     const query = this.$route.query
     localStorage.setItem('CODE', query.code)
     window.history.replaceState({}, document.title, '/')
 
-    fetch('https://accounts.spotify.com/api/token', {
+    await fetch('https://accounts.spotify.com/api/token', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',

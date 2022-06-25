@@ -1,5 +1,5 @@
 <template>
-    <div class="card-container">
+    <div class="card-container" @click=goToShowDetails>
         <p class="title">{{ show.name }}</p>
         <p class="author"><strong>Author: {{ show.publisher }}</strong></p>
         <p>Type: <strong>Show</strong></p>
@@ -14,9 +14,17 @@ export default {
       default (rawProps) {
         return {
           publisher: 'author',
-          name: 'show name'
+          name: 'show name',
+          id: ''
         }
       }
+    }
+  },
+  methods: {
+    goToShowDetails () {
+        this.$router.push({name: 'show details', params: {
+            id: this.show.id
+        } })
     }
   }
 }

@@ -84,7 +84,7 @@ export default {
   margin: 20px;
   display: flex;
   flex-direction: column;
-  gap: 20px
+  gap: 10px
 }
 
 .upper-block{
@@ -95,7 +95,7 @@ export default {
 .down-block {
   background: rgba(0,0,0, 0.2);
   border-radius: 15px;
-  height: 400px;
+  max-height: 57vh;
   overflow-y: scroll;
   position: relative;
 }

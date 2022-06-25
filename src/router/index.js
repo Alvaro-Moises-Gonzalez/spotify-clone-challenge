@@ -7,6 +7,8 @@ import UserPlaylist from '@/views/UserPlaylist.vue'
 import CategoryDetails from '@/views/CategoryDetails.vue'
 import PlaylistScreen from '@/views/PlaylistScreen.vue'
 import ArtistDetails from '@/views/ArtistDetails'
+import AlbumDetails from '@/views/AlbumDetails.vue'
+import ShowDetails from '@/views/ShowDetails.vue'
 
 const routes = [
   {
@@ -48,6 +50,16 @@ const routes = [
     path: '/artist-details/:id',
     name: 'artist details',
     component: ArtistDetails
+  },
+  {
+    path: '/album-details/:id',
+    name: 'album details',
+    component: AlbumDetails
+  },
+  {
+    path: '/show-details/:id',
+    name: 'show details',
+    component: ShowDetails
   }
 ]
 

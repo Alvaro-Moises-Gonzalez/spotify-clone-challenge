@@ -42,7 +42,7 @@
   display: flex;
   flex-wrap: wrap;
   background: rgba(0, 0, 0, 0.2);
-  min-width: 75vw;
+  max-width: 75vw;
   max-height: 65vh;
   margin: 0px 10px;
   border-radius: 15px;

@@ -1,6 +1,6 @@
 <template>
   <div class="general-wrapper">
-    <user-info :userInfo=userInfo />
+    <slot name="aside"></slot>
     <div class="two-rows">
       <div class="upper">
         <slot name="upper"></slot>
@@ -10,39 +10,8 @@
         <slot name="bottom"></slot>
       </div>
     </div>
-    <div class="music-player"></div>
   </div>
 </template>
-
-<script>
-import UserInfo from '@/components/UserInfo.vue'
-import { userEndpoints } from '@/api/endpoints'
-import axios from 'axios'
-export default {
-  components: {
-    UserInfo
-  },
-  data () {
-    return {
-      userInfo: undefined
-    }
-  },
-  created () {
-    (async () => {
-      const config = {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('ACCESS_TOKEN')}`,
-          'Content-type': 'application/json'
-        }
-      }
-      const response = await axios.get(userEndpoints.currentUser, config)
-      const data = await response.data
-      this.userInfo = data
-      localStorage.setItem('COUNTRY', data.country)
-    })()
-  }
-}
-</script>
 
 <style scoped>
 .general-wrapper {
@@ -81,12 +50,5 @@ p {
   font-size: 3rem;
   color: white;
   margin-left: 10px;
-}
-.music-player{
-  width: 100%;
-  height: 60px;
-  background-color: rgb(11, 8, 31);
-  position: sticky;
-  bottom: 0;
 }
 </style>

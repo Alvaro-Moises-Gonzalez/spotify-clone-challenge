@@ -28,6 +28,8 @@ export default {
   created () {
     if (this.artist.images[0]) {
         this.src = this.artist.images[0].url
+    } else {
+        this.src = undefined
     }
   },
   methods: {

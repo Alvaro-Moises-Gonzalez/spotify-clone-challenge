@@ -3,9 +3,9 @@
     <td>{{ trackNumber }}</td>
     <td>
       <img
-        v-if="true"
+        v-if="src"
         class="track-art"
-        :src="track.track.album.images[0].url"
+        :src="src"
         alt="album art"
       />
       <img
@@ -36,7 +36,7 @@ export default {
           track: {
             album: {
               name: 'album name',
-              images: [{ url: '@/assets/album-placeholder.jpg' }]
+              images: ['@/assets/placeholder.jpg']
             },
             artists: [{ name: 'artist name' }],
             duration_ms: '3333333',
@@ -50,11 +50,23 @@ export default {
       default: 1
     }
   },
+  data () {
+    return {
+        src: undefined
+    }
+  },
   methods: {
     toMinutes(ms) {
       const minutes = Math.floor(ms / 60000)
       const seconds = ((ms % 60000) / 1000).toFixed(0)
       return minutes + ':' + (seconds < 10 ? '0' : '') + seconds
+    }
+  },
+  created () {
+    if (this.track.track.album.images[0]) {
+        this.src = this.track.track.album.images[0].url
+    } else {
+        this.src = undefined
     }
   }
 }
@@ -67,6 +79,7 @@ tr {
   font-size: 2rem;
   text-align: center;
   text-transform: capitalize;
+  cursor: pointer;
 }
 
 .author {
