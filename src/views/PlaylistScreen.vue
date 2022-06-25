@@ -35,6 +35,7 @@ export default {
   },
   async created() {
     const id = this.$route.params.id
+    
     const userInfoRespónse = await axios.get(userEndpoints.currentUser, config)
     this.userInfo = userInfoRespónse.data
     const playlistResponse = await axios.get(

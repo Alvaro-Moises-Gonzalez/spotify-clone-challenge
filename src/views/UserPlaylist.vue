@@ -55,7 +55,12 @@ export default {
     }
   },
   async created() {
-
+    const config = {
+        headers: {
+            Authorization: `Bearer ${localStorage.getItem('ACCESS_TOKEN')}`,
+            'Content-type': 'application/json'
+        }
+    }
     const userInfoResponse = await axios.get(userEndpoints.currentUser, config)
     this.userInfo = userInfoResponse.data
     const playlistResponse = await axios.get(

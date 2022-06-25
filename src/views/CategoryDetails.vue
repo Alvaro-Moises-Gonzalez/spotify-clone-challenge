@@ -1,17 +1,24 @@
 <template>
   <layout-details>
+    <template #aside>
+      <user-info :userInfo="userInfo" />
+    </template>
     <template #upper>
-      <img :src="src"  alt="category"/>
+      <img :src="src" alt="category" />
       <p>Category: {{ title }}</p>
     </template>
     <template #bottom>
-      <transition-group
-      appear
-      @beforeEnter=beforeEnter
-      @enter=enter >
+      <transition-group appear @beforeEnter="beforeEnter" @enter="enter">
         <p v-if="items">There no are playlists for this category</p>
-        <playlist-card v-else v-for="playlist, index in playlists" :key="index" :playlist="playlist" />
-        <button class="load-btn" v-if="loadMore" @click=nextLoad > More playlist</button>
+        <playlist-card
+          v-else
+          v-for="(playlist, index) in playlists"
+          :key="index"
+          :playlist="playlist"
+        />
+        <button class="load-btn" v-if="next" @click="nextLoad">
+          More playlist
+        </button>
       </transition-group>
     </template>
   </layout-details>
@@ -20,20 +27,26 @@
 <script>
 import LayoutDetails from '@/Layout/LayoutDetails.vue'
 import PlaylistCard from '@/components/PlaylistCard.vue'
-import { categoriesEndpoints, playlistEndpoints } from '@/api/endpoints'
+import UserInfo from '@/components/UserInfo.vue'
+import {
+  categoriesEndpoints,
+  playlistEndpoints,
+  userEndpoints
+} from '@/api/endpoints'
 import axios from 'axios'
 import gsap from 'gsap'
 export default {
   components: {
     LayoutDetails,
-    PlaylistCard
+    PlaylistCard,
+    UserInfo
   },
   methods: {
-    beforeEnter (el) {
+    beforeEnter(el) {
       el.style.opacity = 0
       el.style.transform = 'translateY(100px)'
     },
-    enter (el, done) {
+    enter(el, done) {
       gsap.to(el, {
         opacity: 1,
         y: 0,
@@ -42,8 +55,8 @@ export default {
         delay: el.dataset.index * 0.2
       })
     },
-    nextLoad () {
-      (async () => {
+    nextLoad() {
+      ;(async () => {
         const config = {
           headers: {
             Authorization: `Bearer ${localStorage.getItem('ACCESS_TOKEN')}`,
@@ -55,42 +68,49 @@ export default {
         if (data.playlists.next) {
           this.next = data.playlists.next
         } else {
-          this.loadMore = false
+          this.next = undefined
         }
         this.playlists = [...this.playlists, ...data.playlists.items]
       })()
     }
   },
-  created () {
-    (async () => {
-      const config = {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('ACCESS_TOKEN')}`,
-          'Content-Type': 'application/json'
-        }
+  async created() {
+    const config = {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('ACCESS_TOKEN')}`,
+        'Content-type': 'application/json'
       }
-      const categoryResponse = await axios.get(categoriesEndpoints.getSubcategories(this.categoryId), config)
-      const data = categoryResponse.data
-      this.src = data.icons[0].url ? data.icons[0].url : '@/assets/placeholder.jpg'
-      this.title = data.name
+    }
+    const userInfoResponse = await axios.get(userEndpoints.currentUser, config)
+    this.userInfo = userInfoResponse.data
+    const categoryResponse = await axios.get(
+      categoriesEndpoints.getSubcategories(this.categoryId),
+      config
+    )
+    const data = categoryResponse.data
+    this.src = data.icons[0].url
+      ? data.icons[0].url
+      : '@/assets/placeholder.jpg'
+    this.title = data.name
 
-      const playlistResponse = await axios.get(playlistEndpoints.getPlaylistFromCategories(this.categoryId), config)
-      const dataPlaylist = playlistResponse.data
-      if (dataPlaylist.playlists.items.length) {
-        this.playlists = dataPlaylist.playlists.items
-        this.loadMore = true
-      } else {
-        this.items = true
-      }
+    const playlistResponse = await axios.get(
+      playlistEndpoints.getPlaylistFromCategories(this.categoryId),
+      config
+    )
+    const dataPlaylist = playlistResponse.data
+    if (dataPlaylist.playlists.items.length) {
+      this.playlists = dataPlaylist.playlists.items
+    } else {
+      this.items = true
+    }
 
     if (dataPlaylist.playlists.next) {
-        this.next = dataPlaylist.playlists.next
+      this.next = dataPlaylist.playlists.next
     } else {
-        this.loadMore = false
+      this.next = undefined
     }
-    })()
   },
-  data () {
+  data() {
     return {
       src: undefined,
       title: '',
@@ -98,7 +118,7 @@ export default {
       categoryId: this.$route.params.id,
       next: undefined,
       items: undefined,
-      loadMore: false
+      userInfo: undefined
     }
   }
 }
@@ -122,7 +142,7 @@ p {
 .load-btn {
   width: 100px;
   height: 100px;
-  background: rgba(0,0,0, 0.4);
+  background: rgba(0, 0, 0, 0.4);
   border-radius: 15px;
   border: none;
   color: white;
