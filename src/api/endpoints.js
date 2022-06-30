@@ -74,6 +74,24 @@ const playlistEndpoints = {
 }
 
 const searchEndpoint = (string, array) => `${baseURL}/search?q=${string}&type=${array}`
+
+const playerEndpoints = {
+  getPlaybackState: `${baseURL}/me/player?country=${localStorage.getItem('COUNTRY')}&market=${localStorage.getItem('COUNTRY')}`,
+  putTransferPlayback: `${baseURL}/me/player`,
+  getAvaliableDevices: `${baseURL}/me/player/devices`,
+  currentlyPlaying: `${baseURL}/me/player/currently-playing?country=${localStorage.getItem('COUNTRY')}&market=${localStorage.getItem('COUNTRY')}`,
+  startResumePlayback: `${baseURL}/me/player/play?`,
+  pausePlayback: `${baseURL}/me/player/pause`,
+  skipToNext: `${baseURL}/me/player/next`,
+  skiptoPrevius: `${baseURL}/me/player/previous`,
+  seekToPosition: (position) => `${baseURL}/me/player/seek?postion_ms=${position}`,
+  repeatTrack: `${baseURL}/me/player/repeat?state="track`,
+  repeatContext: `${baseURL}/me/player/repeat?state="context`,
+  repeatOff: `${baseURL}/me/player/repeat?state="off`,
+  setVolume: (vol) => `${baseURL}/me/player/volume?volume_percent=${vol}`,
+  shuffle: (state) =>`${baseURL}/me/player/shuffle?state=${state}`,
+  AddToQueue: (uri) => `${baseURL}/me/player/queue?uri=${uri}`
+}
 export {
   userEndpoints,
   categoriesEndpoints,
@@ -83,5 +101,6 @@ export {
   showsEndpoints,
   episodesEndpoints,
   tracksEndpoints,
-  playlistEndpoints
+  playlistEndpoints,
+  playerEndpoints
 }
