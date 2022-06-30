@@ -7,5 +7,10 @@ export const scopes = [
   'user-follow-read',
   'ugc-image-upload',
   'playlist-read-collaborative',
-  'playlist-read-private'
+  'playlist-read-private',
+  'app-remote-control',
+  'streaming',
+  'user-modify-playback-state',
+  'user-read-playback-state',
+  'user-read-currently-playing'
 ]
