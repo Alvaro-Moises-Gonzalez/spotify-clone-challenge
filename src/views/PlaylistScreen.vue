@@ -25,7 +25,6 @@ import TrackRow from '@/components/TrackRow.vue'
 import UserInfo from '@/components/UserInfo.vue'
 import axios from 'axios'
 import { playlistEndpoints, userEndpoints } from '@/api/endpoints'
-import { config } from '@/api/config'
 export default {
   components: {
     PlaylistDetailsLayout,
@@ -35,7 +34,12 @@ export default {
   },
   async created() {
     const id = this.$route.params.id
-    
+    const config = {
+        headers: {
+            Authorization: 'Bearer' + ' ' + localStorage.getItem('ACCESS_TOKEN'),
+            'Content-Type': 'application/json'
+        }
+    }
     const userInfoRespónse = await axios.get(userEndpoints.currentUser, config)
     this.userInfo = userInfoRespónse.data
     const playlistResponse = await axios.get(

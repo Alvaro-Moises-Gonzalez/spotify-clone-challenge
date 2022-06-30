@@ -38,17 +38,19 @@ export default {
     UserInfo
   },
   async created() {
+
     const config = {
-        headers: {
-            Authorization: `Bearer ${localStorage.getItem('ACCESS_TOKEN')}`,
-            'Content-type': 'application/json'
-        }
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('ACCESS_TOKEN')}`,
+        'Content-Type': 'application/json'
+      }
     }
+
     const userInfoResponse = await axios.get(userEndpoints.currentUser, config)
+
     const userData = userInfoResponse.data
     this.userInfo = userData
     localStorage.setItem('COUNTRY', userData.country)
-
 
     const categoryResponse = await axios.get(
       `${categoriesEndpoints.getCategories}?country=${localStorage.getItem(

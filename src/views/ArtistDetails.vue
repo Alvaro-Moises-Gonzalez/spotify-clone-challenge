@@ -59,8 +59,7 @@ export default {
         delay: el.dataset.index * 0.2
       })
     },
-    getMoreAlbums() {
-      (async () => {
+    async getMoreAlbums() {
         const MoreAlbums = await axios.get(this.next, config)
         this.albums = [...this.albums, ...MoreAlbums.data.items]
         if (MoreAlbums.data.next) {
@@ -68,7 +67,6 @@ export default {
         } else {
           this.next = undefined
         }
-      })()
     }
   },
   async created() {

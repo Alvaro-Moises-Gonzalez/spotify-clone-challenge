@@ -106,88 +106,97 @@ export default {
         config
       )
       const data = response.data
-      if (data.playlists) {
-        this.playlists = data.playlists.items
-        if (data.playlists.next) {
-          this.next = data.playlists.next
-        } else {
-          this.next = undefined
-        }
+      switch (this.selected) {
+        case 'artist':
+          this.artists = data.artists.items
+          if (data.artists.next) {
+            this.next = data.artists.next
+          } else {
+            this.next = undefined
+          }
 
-        this.tracks = []
-        this.albums = []
-        this.shows = []
-        this.episodes = []
-        this.artists = []
-      }
-      if (data.artists) {
-        this.artists = data.artists.items
-        if (data.artists.next) {
-          this.next = data.artists.next
-        } else {
-          this.next = undefined
-        }
+          this.playlists = []
+          this.tracks = []
+          this.albums = []
+          this.shows = []
+          this.episodes = []
+          break
+        case 'playlist':
+          this.playlists = data.playlists.items
+          if (data.playlists.next) {
+            this.next = data.playlists.next
+          } else {
+            this.next = undefined
+          }
 
-        this.playlists = []
-        this.tracks = []
-        this.albums = []
-        this.shows = []
-        this.episodes = []
-      }
-      if (data.tracks) {
-        this.tracks = data.tracks.items
-        if (data.tracks.next) {
-          this.next = data.tracks.next
-        } else {
-          this.next = undefined
-        }
+          this.tracks = []
+          this.albums = []
+          this.shows = []
+          this.episodes = []
+          this.artists = []
+          break
+        case 'track':
+          this.tracks = data.tracks.items
+          if (data.tracks.next) {
+            this.next = data.tracks.next
+          } else {
+            this.next = undefined
+          }
 
-        this.playlists = []
-        this.albums = []
-        this.shows = []
-        this.episodes = []
-        this.artists = []
-      }
-      if (data.albums) {
-        this.albums = data.albums.items
-        if (data.albums.next) {
-          this.next = data.albums.next
-        } else {
-          this.next = undefined
-        }
+          this.playlists = []
+          this.albums = []
+          this.shows = []
+          this.episodes = []
+          this.artists = []
+          break
+        case 'show':
+          this.shows = data.shows.items
+          if (data.shows.next) {
+            this.next = data.shows.next
+          } else {
+            this.next = undefined
+          }
+          this.playlists = []
+          this.tracks = []
+          this.albums = []
+          this.episodes = []
+          this.artists = []
+          break
+        case 'episode':
+          this.episodes = data.episodes.items
+          if (data.episodes.next) {
+            this.next = data.episodes.next
+          } else {
+            this.next = undefined
+          }
 
-        this.playlists = []
-        this.tracks = []
-        this.shows = []
-        this.episodes = []
-        this.artists = []
-      }
-      if (data.episodes) {
-        this.episodes = data.episodes.items
-        if (data.episodes.next) {
-          this.next = data.episodes.next
-        } else {
-          this.next = undefined
-        }
+          this.playlists = []
+          this.tracks = []
+          this.albums = []
+          this.shows = []
+          this.artists = []
+          break
+        case 'album':
+          this.albums = data.albums.items
+          if (data.albums.next) {
+            this.next = data.albums.next
+          } else {
+            this.next = undefined
+          }
 
-        this.playlists = []
-        this.tracks = []
-        this.albums = []
-        this.shows = []
-        this.artists = []
-      }
-      if (data.shows) {
-        this.shows = data.shows.items
-        if (data.shows.next) {
-          this.next = data.shows.next
-        } else {
-          this.next = undefined
-        }
-        this.playlists = []
-        this.tracks = []
-        this.albums = []
-        this.episodes = []
-        this.artists = []
+          this.playlists = []
+          this.tracks = []
+          this.shows = []
+          this.episodes = []
+          this.artists = []
+          break
+        default:
+          this.playlists = []
+          this.tracks = []
+          this.shows = []
+          this.episodes = []
+          this.artists = []
+          break
       }
     },
     change(event) {
@@ -196,58 +205,56 @@ export default {
     async nextLoad() {
       const nextLoad = await axios.get(this.next, config)
       const nextData = nextLoad.data
-      if (nextData.artists) {
-        this.artists = [...this.artists, ...nextData.artists.items]
-        if (nextData.artists.next) {
-          this.next = nextData.artists.next
-        } else {
+      switch (this.selected) {
+        case 'artist':
+          this.artists = [...this.artists, ...nextData.artists.items]
+          if (nextData.artists.next) {
+            this.next = nextData.artists.next
+          } else {
+            this.next = undefined
+          }
+          break
+        case 'album':
+          this.albums = [...this.albums, ...nextData.albums.items]
+          if (nextData.albums.next) {
+            this.next = nextData.albums.next
+          } else {
+            this.next = undefined
+          }
+          break
+        case 'track':
+          this.tracks = [...this.tracks, ...nextData.tracks.items]
+          if (nextData.tracks.next) {
+            this.next = nextData.tracks.next
+          } else {
+            this.next = undefined
+          }
+          break
+        case 'show':
+          this.shows = [...this.shows, ...nextData.shows.items]
+          if (nextData.shows.next) {
+            this.next = nextData.shows.next
+          } else {
+            this.next = undefined
+          }
+          break
+        case 'episode':
+          if (nextData.tracks.next) {
+            this.next = nextData.episodes.next
+          } else {
+            this.next = undefined
+          }
+          break
+        case 'playlist':
+          this.playlists = [...this.playlists, ...nextData.playlists.items]
+          if (nextData.playlists.next) {
+            this.next = nextData.playlits.next
+          } else {
+            this.next = undefined
+          }
+          break
+        default:
           this.next = undefined
-        }
-      }
-
-      if (nextData.albums) {
-        this.albums = [...this.albums, ...nextData.albums.items]
-        if (nextData.albums.next) {
-          this.next = nextData.albums.next
-        } else {
-          this.next = undefined
-        }
-      }
-
-      if (nextData.tracks) {
-        this.tracks = [...this.tracks, ...nextData.tracks.items]
-        if (nextData.tracks.next) {
-          this.next = nextData.tracks.next
-        } else {
-          this.next = undefined
-        }
-      }
-
-      if (nextData.shows) {
-        this.shows = [...this.shows, ...nextData.shows.items]
-        if (nextData.shows.next) {
-          this.next = nextData.shows.next
-        } else {
-          this.next = undefined
-        }
-      }
-
-      if (nextData.episodes) {
-        this.episodes = [...this.episodes, ...nextData.episodes.items]
-        if (nextData.tracks.next) {
-          this.next = nextData.episodes.next
-        } else {
-          this.next = undefined
-        }
-      }
-
-      if (nextData.playlists) {
-        this.playlists = [...this.playlists, ...nextData.playlists.items]
-        if (nextData.playlists.next) {
-          this.next = nextData.playlits.next
-        } else {
-          this.next = undefined
-        }
       }
     },
     beforeEnter(el) {
@@ -266,13 +273,15 @@ export default {
   },
   async created() {
     const config = {
-        headers: {
-            Authorization: `Bearer ${localStorage.getItem('ACCESS_TOKEN')}`,
-            'Content-type': 'application/json'
-        }
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('ACCESS_TOKEN')}`,
+        'Content-Type': 'application/json'
+      }
     }
-    const userInfoResponse = await axios.get(userEndpoints.currentUser, config)
-    this.userInfo = await userInfoResponse.data
+    const userInfoResponse = await axios
+      .get(userEndpoints.currentUser, config)
+      .catch((error) => console.log(error))
+    this.userInfo = userInfoResponse.data
   }
 }
 </script>
