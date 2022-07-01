@@ -66,7 +66,6 @@ import EpisodeCard from '@/components/EpisodeCard.vue'
 import UserInfo from '@/components/UserInfo.vue'
 import gsap from 'gsap'
 import { searchEndpoint, userEndpoints } from '@/api/endpoints'
-import { config } from '@/api/config'
 import axios from 'axios'
 
 export default {
@@ -96,6 +95,13 @@ export default {
   },
   methods: {
     async fetchSearch() {
+      const config = {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('ACCESS_TOKEN')}`,
+          'Content-Type': 'application/json'
+        }
+      }
+
       const response = await axios.get(
         `${searchEndpoint(
           this.value,
@@ -203,6 +209,12 @@ export default {
       this.selected = event.target.value
     },
     async nextLoad() {
+    const config = {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('ACCESS_TOKEN')}`,
+          'Content-Type': 'application/json'
+        }
+      }
       const nextLoad = await axios.get(this.next, config)
       const nextData = nextLoad.data
       switch (this.selected) {

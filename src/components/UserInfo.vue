@@ -37,7 +37,7 @@ export default {
         }
       }
       await fetch(
-        playerEndpoints.pausePlayback(localStorage.getItem('DEVICE_ID')),
+        playerEndpoints.pausePlayback,
         config
       )
       localStorage.removeItem('CODE')
