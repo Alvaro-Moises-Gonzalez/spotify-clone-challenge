@@ -64,7 +64,7 @@ export default {
         }
       }
       await fetch(
-        playerEndpoints.pausePlayback(localStorage.getItem('DEVICE_ID')),
+        playerEndpoints.pausePlayback,
         config
       )
       this.togglePlay()
@@ -94,7 +94,7 @@ export default {
         })
       }
       await fetch(
-        playerEndpoints.skipToNext(localStorage.getItem('DEVICE_ID')),
+        playerEndpoints.skipToNext,
         config
       )
       if(this.isPlaying !== false) {

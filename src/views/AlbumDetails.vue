@@ -4,7 +4,7 @@
       <user-info :userInfo="userInfo" />
     </template>
     <template #upper>
-      <album-thumbnail :album="album" :src="src" />
+      <album-thumbnail :album="album" :src="src" :playAlbum="playAlbum" />
     </template>
     <template #bottom>
       <table>
@@ -20,6 +20,7 @@
             :data-index="index"
             :track="track"
             :trackNumber="index + 1"
+            @playTrack=playTrack
           />
         </transition-group>
       </table>
@@ -33,8 +34,7 @@ import AlbumDetailLayout from '@/Layout/AlbumDetailLayout.vue'
 import userInfo from '@/components/UserInfo.vue'
 import AlbumTrackRow from '@/components/AlbumTrackRow.vue'
 import axios from 'axios'
-import { userEndpoints, albumsEndpoints } from '@/api/endpoints'
-import { config } from '@/api/config'
+import { userEndpoints, albumsEndpoints, playerEndpoints } from '@/api/endpoints'
 import gsap from 'gsap'
 
 export default {
@@ -57,6 +57,39 @@ export default {
         onComplete: done,
         delay: el.dataset.index * 0.2
       })
+    },
+    async playAlbum () {
+        const uri = this.album.uri
+        const config = {
+            method: 'PUT',
+            headers: {
+                Authorization: 'Bearer' + ' ' + localStorage.getItem('ACCESS_TOKEN')
+            },
+            body: JSON.stringify({
+                context_uri: `${uri}`,
+                offset: {
+                    position: '0'
+                },
+                position_ms: '0'
+            })
+        }
+        await fetch(playerEndpoints.startResumePlayback, config)
+    },
+    async playTrack (number) {
+        const config = {
+            method: 'PUT',
+            headers: {
+                Authorization: 'Bearer' + ' ' + localStorage.getItem('ACCESS_TOKEN')
+            },
+            body: JSON.stringify({
+                uris: this.trackUris,
+                offset: {
+                    position: `${number}`
+                },
+                position_ms: '0'
+            })
+        }
+        await fetch(playerEndpoints.startResumePlayback, config)
     }
   },
   data() {
@@ -64,10 +97,18 @@ export default {
       albumTracks: undefined,
       userInfo: undefined,
       album: undefined,
-      src: undefined
+      src: undefined,
+      trackUris: undefined
     }
   },
   async created() {
+    const config = {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('ACCESS_TOKEN')}`,
+        'Content-Type': 'application/json'
+      }
+    }
+
     const id = this.$route.params.id
     const userInfo = await axios.get(userEndpoints.currentUser, config)
     this.userInfo = userInfo.data
@@ -77,8 +118,8 @@ export default {
     this.src = albumResponse.data.images[0].url || undefined
 
     const tracks = await axios.get(albumsEndpoints.getAlbumTracks(id), config)
-    console.log(tracks.data)
     this.albumTracks = tracks.data.items
+    this.trackUris = this.albumTracks.map ( track => track.uri)
   }
 }
 </script>

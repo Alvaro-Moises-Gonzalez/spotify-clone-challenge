@@ -1,5 +1,5 @@
 <template>
-  <tr>
+  <tr @click="play">
     <td>{{ trackNumber }}</td>
     <td>
       <p class="title">{{ track.name }}</p>
@@ -35,6 +35,9 @@ export default {
       const minutes = Math.floor(ms / 60000)
       const seconds = ((ms % 60000) / 1000).toFixed(0)
       return minutes + ':' + (seconds < 10 ? '0' : '') + seconds
+    },
+    play () {
+        this.$emit('playTrack', this.trackNumber - 1)
     }
   }
 }

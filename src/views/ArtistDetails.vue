@@ -71,6 +71,12 @@ export default {
   },
   async created() {
     const id = this.$route.params.id
+     const config = {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('ACCESS_TOKEN')}`,
+        'Content-Type': 'application/json'
+      }
+    }
     const userResponse = await axios.get(userEndpoints.currentUser, config)
     this.userInfo = userResponse.data
 
