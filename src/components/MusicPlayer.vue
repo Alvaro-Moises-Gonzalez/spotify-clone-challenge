@@ -39,14 +39,6 @@ export default {
       duration: '0'
     }
   },
-  props: {
-    play: {
-      type: Function,
-      default () {
-        return console.log('default function')
-      }
-    }
-  },
   methods: {
     togglePlay() {
       this.isPlaying = !this.isPlaying
@@ -100,7 +92,17 @@ export default {
       if(this.isPlaying !== false) {
         this.togglePlay()
       }
-
+    },
+    async play () {
+        const config = {
+        method: 'PUT',
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('ACCESS_TOKEN')}`,
+          'Content-Type': 'application/json'
+        }
+      }
+      await fetch(playerEndpoints.startResumePlayback, config)
+      this.isPlaying= false;
     }
   }
 }
