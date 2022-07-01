@@ -4,7 +4,7 @@
       <user-info :userInfo="userInfo" />
     </template>
     <template #upper>
-      <show-thumbnail :show="show" :src="src" />
+      <show-thumbnail :show="show" :src="src" :playShow="playShow" />
     </template>
     <template #bottom>
       <table>
@@ -22,6 +22,7 @@
             :data-index="index"
             :episodeNumber="index + 1"
             :episode="episode"
+            @playEpisode="playEpisode"
           />
         </transition-group>
         <button v-if="next" @click=nextEpisodes class="more-episodes"> more </button>
@@ -39,10 +40,11 @@ import axios from 'axios'
 import gsap from 'gsap'
 
 import {
+  playerEndpoints,
   showsEndpoints,
   userEndpoints
 } from '@/api/endpoints'
-import { config } from '@/api/config'
+
 
 export default {
   components: {
@@ -53,12 +55,19 @@ export default {
   },
   async created() {
     const id = this.$route.params.id
+    const config = {
+        headers: {
+            Authorization: 'Bearer' + ' ' + localStorage.getItem('ACCESS_TOKEN'),
+            'Content-Type': 'application/json'
+        }
+    }
 
     const userInfoResponse = await axios.get(userEndpoints.currentUser, config)
     this.userInfo = userInfoResponse.data
 
     const showResponse = await axios.get(showsEndpoints.getShow(id), config)
     this.show = showResponse.data
+    this.showUri = showResponse.data.uri
 
     this.src = showResponse.data.images[0]
       ? showResponse.data.images[0].url
@@ -68,6 +77,7 @@ export default {
       showsEndpoints.getEpisodes(id),
       config
     )
+    this.episodesUris = episodesResponse.data.items.map( episode => episode.uri)
     this.episodes = episodesResponse.data.items
     if (episodesResponse.data.next) {
         this.next = episodesResponse.data.next
@@ -79,7 +89,9 @@ export default {
       show: undefined,
       userInfo: undefined,
       episodes: undefined,
-      next: undefined
+      next: undefined,
+      showUri: undefined,
+      episodesUris: undefined
     }
   },
   methods: {
@@ -97,6 +109,12 @@ export default {
       })
     },
     async nextEpisodes () {
+        const config = {
+        headers: {
+            Authorization: 'Bearer' + ' ' + localStorage.getItem('ACCESS_TOKEN'),
+            'Content-Type': 'application/json'
+        }
+    }
         const moreEpisodes = await axios.get(this.next, config)
         this.episodes = [...this.episodes, ...moreEpisodes.data.items]
         if ( moreEpisodes.data.next) {
@@ -104,6 +122,41 @@ export default {
         } else {
             this.next = undefined
         }
+    },
+    async playShow () {
+        const uri = this.showUri
+        const config = {
+            method: 'PUT',
+            headers: {
+                Authorization: 'Bearer' + ' ' + localStorage.getItem('ACCESS_TOKEN'),
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                context_uri: `${uri}`,
+                offset: {
+                    position: '0'
+                },
+                position_ms: '0'
+            })
+        }
+        await fetch(playerEndpoints.startResumePlayback, config)
+    },
+    async playEpisode (number) {
+        const config = {
+            method: 'PUT',
+            headers: {
+                Authorization: 'Bearer' + ' ' + localStorage.getItem('ACCESS_TOKEN'),
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                uris: this.episodesUris,
+                offset: {
+                    position: `${number}`
+                },
+                position_ms: '0'
+            })
+        }
+        await fetch(playerEndpoints.startResumePlayback, config)
     }
   }
 }

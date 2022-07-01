@@ -8,6 +8,7 @@
       <p :v-if="show.copyrights">{{ show.copyrights.join(', ') }}</p>
       <p>{{ show.description }}</p>
       <p>Total epísodes: {{ show.total_episodes }}</p>
+      <button class="play-btn" @click=playShow>From the beginning</button>
     </div>
   </div>
 </template>
@@ -30,6 +31,12 @@ export default {
     },
     src: {
       type: String
+    },
+    playShow: {
+        type: Function,
+        default () {
+            return console.log('playing show')
+        }
     }
   }
 }
@@ -66,5 +73,21 @@ img {
 }
 p {
   margin-left: 5px;
+}
+.play-btn {
+    width: 200px;
+    height: 30px;
+    border-radius: 15px;
+    background: rgba(0, 0,0, 0.6);
+    border: none;
+    font-size: 20px;
+    color: white;
+    cursor: pointer;
+    font-size: 1.5rem;
+}
+
+.play-btn:hover{
+    outline: 2px solid aqua;
+    color: aqua;
 }
 </style>

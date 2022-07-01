@@ -1,5 +1,5 @@
 <template>
-  <tr>
+  <tr @click=playEpisode>
     <td>{{ episodeNumber }}</td>
     <td>
       <img v-if="src" class="track-art" :src="src" alt="album art" />
@@ -48,6 +48,9 @@ export default {
       const minutes = Math.floor(ms / 60000)
       const seconds = ((ms % 60000) / 1000).toFixed(0)
       return minutes + ':' + (seconds < 10 ? '0' : '') + seconds
+    },
+    playEpisode () {
+        this.$emit('playEpisode', this.episodeNumber - 1)
     }
   },
   created() {
