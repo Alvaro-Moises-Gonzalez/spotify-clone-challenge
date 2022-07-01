@@ -53,7 +53,7 @@ header p{
   letter-spacing: 0.2rem;
 }
 .container {
-  height: 600px;
+  height: 525px;
   background: linear-gradient(rgba(0,0,0, 0.8), rgba(0,0,0, 0.2)), url("../assets/background-landing.jpg");
   background-size: cover;
   display: flex;
