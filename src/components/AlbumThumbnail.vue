@@ -7,8 +7,7 @@
       <p class="date"> Release: {{ album.release_date }}</p>
       <p class="artists">{{ album.artists.map( artist => artist.name).join(', ') }}</p>
       <p class="tracks">Total Tracks: {{ album.total_tracks }}</p>
-      <button v-if="isPlayingAlbum" class="play-btn" @click=playAlbum><i class="fas fa-play"></i></button>
-      <button v-else class="play-btn"><i class="fas fa-pause"></i></button>
+      <button class="play-btn" @click=playAlbum>From the beginning</button>
     </div>
   </div>
 </template>
@@ -81,14 +80,19 @@ p {
 }
 
 .play-btn {
-    width: 50px;
+    width: 100px;
     height: 45px;
-    margin-top: 2px;
     border-radius: 15px;
-    background: rgb(50, 240, 29);
+    background: rgba(0, 0,0, 0.6);
     border: none;
     font-size: 20px;
     color: white;
     cursor: pointer;
+    font-size: 1.5rem;
+}
+
+.play-btn:hover{
+    outline: 2px solid aqua;
+    color: aqua;
 }
 </style>
