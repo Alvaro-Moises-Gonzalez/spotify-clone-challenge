@@ -1,10 +1,14 @@
 <template>
   <playlist-details-layout>
     <template #aside>
-        <user-info :userInfo="userInfo" />
+      <user-info :userInfo="userInfo" />
     </template>
     <template #upper-block>
-      <playlist-thumbnail :playlist1="playlist" :source="source" />
+      <playlist-thumbnail
+        :playlist1="playlist"
+        :source="source"
+        :playPlaylist="playPlaylist"
+      />
     </template>
     <template #rows>
       <track-row
@@ -13,6 +17,7 @@
         :data-index="index"
         :track="track"
         :trackNumber="index + 1"
+        @playTrack="playTrack"
       />
     </template>
   </playlist-details-layout>
@@ -24,7 +29,11 @@ import PlaylistThumbnail from '@/components/PlaylistThumbnail.vue'
 import TrackRow from '@/components/TrackRow.vue'
 import UserInfo from '@/components/UserInfo.vue'
 import axios from 'axios'
-import { playlistEndpoints, userEndpoints } from '@/api/endpoints'
+import {
+  playlistEndpoints,
+  userEndpoints,
+  playerEndpoints
+} from '@/api/endpoints'
 export default {
   components: {
     PlaylistDetailsLayout,
@@ -35,34 +44,72 @@ export default {
   async created() {
     const id = this.$route.params.id
     const config = {
-        headers: {
-            Authorization: 'Bearer' + ' ' + localStorage.getItem('ACCESS_TOKEN'),
-            'Content-Type': 'application/json'
-        }
+      headers: {
+        Authorization: 'Bearer' + ' ' + localStorage.getItem('ACCESS_TOKEN'),
+        'Content-Type': 'application/json'
+      }
     }
     const userInfoRespónse = await axios.get(userEndpoints.currentUser, config)
     this.userInfo = userInfoRespónse.data
+
     const playlistResponse = await axios.get(
       playlistEndpoints.getPlaylist(id),
       config
     )
-    const playlistData = playlistResponse.data
-    this.playlist = playlistData
-    console.log(playlistData.tracks.items)
-    if (playlistData.images) {
-      this.source = playlistData.images[0].url
+    this.playlist = playlistResponse.data
+    if (this.playlist.images) {
+      this.source = this.playlist.images[0].url
     } else {
       this.source = '@/assets/album-placeholder.jpg'
     }
-    const tracksArray = playlistData.tracks.items
+    const tracksArray = this.playlist.tracks.items
     this.tracks = tracksArray
+    this.trackUris = tracksArray.map( track => track.track.uri)
   },
   data() {
     return {
       playlist: undefined,
       source: undefined,
       tracks: undefined,
-      userInfo: undefined
+      userInfo: undefined,
+      trackUris: undefined
+    }
+  },
+  methods: {
+    async playPlaylist() {
+      const uri = this.playlist.uri
+      const config = {
+        method: 'PUT',
+        headers: {
+          Authorization: 'Bearer' + ' ' + localStorage.getItem('ACCESS_TOKEN'),
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          context_uri: `${uri}`,
+          offset: {
+            position: '0'
+          },
+          position_ms: '0'
+        })
+      }
+      await fetch(playerEndpoints.startResumePlayback, config)
+    },
+    async playTrack (number) {
+        const config = {
+            method: 'PUT',
+            headers: {
+                Authorization: 'Bearer' + ' ' + localStorage.getItem('ACCESS_TOKEN'),
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                uris: this.trackUris,
+                offset: {
+                    position: `${number}`
+                },
+                position_ms: '0'
+            })
+        }
+        await fetch(playerEndpoints.startResumePlayback, config)
     }
   }
 }

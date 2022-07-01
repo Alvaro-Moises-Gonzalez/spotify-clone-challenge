@@ -6,6 +6,7 @@
       <p class="title">{{ playlist1.name }}</p>
       <p class="author">{{ playlist1.owner.display_name }}</p>
       <p class="number">{{ playlist1.tracks.total }} Tracks</p>
+      <button class="play-btn" @click=playPlaylist>From the beginning</button>
       <p class="description">{{ playlist1.description }}</p>
     </div>
   </div>
@@ -33,6 +34,12 @@ export default {
     },
     source: {
       type: String
+    },
+    playPlaylist: {
+        type: Function,
+        default () {
+            return console.log('playing album')
+        }
     }
   }
 }
@@ -52,13 +59,13 @@ export default {
 
 .thumbnail-info {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr 1fr 1fr;
   grid-template-rows: 0.5fr 0.5fr 2fr;
   margin: 20px;
   color: white;
 }
 .title {
-  grid-column: span 2;
+  grid-column: span 3;
   font-size: 3rem;
 }
 .author {
@@ -70,5 +77,22 @@ export default {
 .description {
   grid-column: span 2;
   font-size: 2rem;
+}
+
+.play-btn {
+    width: 100px;
+    height: 45px;
+    border-radius: 15px;
+    background: rgba(0, 0,0, 0.6);
+    border: none;
+    font-size: 20px;
+    color: white;
+    cursor: pointer;
+    font-size: 1.5rem;
+}
+
+.play-btn:hover{
+    outline: 2px solid aqua;
+    color: aqua;
 }
 </style>
