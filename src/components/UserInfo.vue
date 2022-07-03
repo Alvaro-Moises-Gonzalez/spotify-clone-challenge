@@ -20,7 +20,7 @@
       </button></router-link
     >
     <button class="logout-btn" @click="logout">Logout</button>
-    <music-player />
+    <music-player :trackName="trackName" :trackDuration="trackDuration" :isPlaying="isPlaying" :progress="progress"/>
   </div>
 </template>
 
@@ -58,6 +58,22 @@ export default {
           display_name: ''
         }
       }
+    },
+    trackName: {
+        type: String,
+        default: 'default from user'
+    },
+    trackDuration:{
+        type: Number,
+        default: 10000
+    },
+    progress: {
+        Type: Number,
+        default: 0
+    },
+    isPlaying:{
+        type: Boolean,
+        default: true
     }
   },
   components: {

@@ -7,102 +7,54 @@
       v-if="isPlaying"
       class="media"
       :class="{ active: isPlaying }"
-      @click="togglePlay(); play();"
-      >
+      @click="play"
+    >
       <i class="fas fa-play"></i>
     </button>
-    <button
-      v-else
-      class="media"
-      @click="pause"
-    >
+    <button v-else class="media" @click="pause">
       <i class="fas fa-pause"></i>
     </button>
     <button class="foward" @click="nextTrack">
       <i class="fas fa-forward"></i>
     </button>
     <p class="name">{{ trackName }}</p>
-    <p>{{ msToMinutes(0) }}</p>
-    <input type="range" min="0" max="100" value="25" />
-    <p>{{ msToMinutes(parseInt(duration)) }}</p>
+    <p>{{ msToMinutes(progress) }}</p>
+    <input type="range" min="0" :max="trackDuration" :value="progress" />
+    <p>{{ msToMinutes(trackDuration) }}</p>
   </div>
 </template>
 
 <script>
-import { playerEndpoints } from '@/api/endpoints'
 export default {
+  props: {
+    trackName: {
+      type: String,
+      default: 'default prop'
+    },
+    trackDuration: {
+      type: Number,
+      default: 0
+    },
+    progress: {
+      type: Number,
+      default: 0
+    },
+    isPlaying: {
+      type: Boolean,
+      default: true
+    }
+  },
+  inject: ['nextTrack', 'prevTrack', 'pause', 'play'],
   data() {
     return {
-      isPlaying: true,
-      trackName: '',
-      artistName: '',
-      duration: '0'
+      totalSeconds: 0
     }
   },
   methods: {
-    togglePlay() {
-      this.isPlaying = !this.isPlaying
-    },
     msToMinutes(ms) {
       var minutes = Math.floor(ms / 60000)
       var seconds = ((ms % 60000) / 1000).toFixed(0)
       return minutes + ':' + (seconds < 10 ? '0' : '') + seconds
-    },
-    async pause() {
-      const config = {
-        method: 'PUT',
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('ACCESS_TOKEN')}`
-        }
-      }
-      await fetch(
-        playerEndpoints.pausePlayback,
-        config
-      )
-      this.togglePlay()
-    },
-    async prevTrack() {
-      await fetch(playerEndpoints.skiptoPrevius, {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('ACCESS_TOKEN')}`
-        }
-      })
-      if(this.isPlaying !== false) {
-        this.togglePlay()
-      }
-
-    },
-    async nextTrack() {
-      const config = {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('ACCESS_TOKEN')}`,
-          'Content-Type': 'application/json'
-        },
-        data: JSON.stringify({
-          clear_preloaded: 'true',
-          play: 'false'
-        })
-      }
-      await fetch(
-        playerEndpoints.skipToNext,
-        config
-      )
-      if(this.isPlaying !== false) {
-        this.togglePlay()
-      }
-    },
-    async play () {
-        const config = {
-        method: 'PUT',
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('ACCESS_TOKEN')}`,
-          'Content-Type': 'application/json'
-        }
-      }
-      await fetch(playerEndpoints.startResumePlayback, config)
-      this.isPlaying= false;
     }
   }
 }
