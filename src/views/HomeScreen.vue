@@ -1,7 +1,13 @@
 <template>
   <layout-screen>
     <template #aside>
-      <user-info :userInfo="userInfo" />
+      <user-info
+        :userInfo="userInfo"
+        :isPlaying="playing"
+        :trackDuration="trackDuration"
+        :progress="totalSeconds"
+        :trackName="currentTrack"
+      />
     </template>
     <template #upper>
       <p class="title">Select by Category</p>
@@ -28,7 +34,11 @@ import LayoutScreen from '@/Layout/LayoutScreen.vue'
 import UserInfo from '@/components/UserInfo.vue'
 import gsap from 'gsap'
 import axios from 'axios'
-import { categoriesEndpoints, userEndpoints } from '@/api/endpoints'
+import {
+  categoriesEndpoints,
+  playerEndpoints,
+  userEndpoints
+} from '@/api/endpoints'
 import { config } from '@/api/config'
 
 export default {
@@ -37,8 +47,34 @@ export default {
     LayoutScreen,
     UserInfo
   },
+  watch: {
+    async totalSeconds(oldVal) {
+      if (oldVal >= this.trackDuration) {
+        clearInterval(this.interval)
+        setTimeout(async () => {
+          const config = {
+            headers: {
+              Authorization:
+                'Bearer' + ' ' + localStorage.getItem('ACCESS_TOKEN'),
+              'Content-Type': 'application/json'
+            }
+          }
+          const currentResponse = await axios.get(
+            playerEndpoints.currentlyPlaying,
+            config
+          )
+          const currentData = currentResponse.data
+          this.currentTrack = currentData.item.name
+          this.trackDuration = currentData.item.duration_ms
+          this.totalSeconds = 0
+          this.totalSeconds = currentData.progress_ms
+          this.playing = false
+          this.timer()
+        }, 1000)
+      }
+    }
+  },
   async created() {
-
     const config = {
       headers: {
         Authorization: `Bearer ${localStorage.getItem('ACCESS_TOKEN')}`,
@@ -65,12 +101,29 @@ export default {
     } else {
       this.next = undefined
     }
+    const currentResponse = await axios.get(
+      playerEndpoints.currentlyPlaying,
+      config
+    )
+    const currentData = currentResponse.data
+    this.currentTrack = currentData.item.name
+    this.trackDuration = currentData.item.duration_ms
+    this.totalSeconds = currentData.progress_ms
+    if (currentData.is_playing == true) {
+    this.playing = false
+    this.timer()
+    }
   },
   data() {
     return {
       categories: [],
       next: undefined,
-      userInfo: undefined
+      userInfo: undefined,
+      currentTrack: '',
+      trackDuration: 0,
+      playing: true,
+      totalSeconds: 0,
+      interval: undefined
     }
   },
   methods: {
@@ -96,6 +149,110 @@ export default {
         onComplete: done,
         delay: el.dataset.index * 0.2
       })
+    },
+    timer() {
+      const addSeconds = () => {
+        this.totalSeconds += 110
+      }
+      this.interval = setInterval(addSeconds, 100)
+    },
+    async prevTrack() {
+      clearInterval(this.interval)
+      await fetch(playerEndpoints.skiptoPrevius, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('ACCESS_TOKEN')}`
+        }
+      })
+      setTimeout(async () => {
+        const currentResponse = await axios.get(
+          playerEndpoints.currentlyPlaying,
+          {
+            headers: {
+              Authorization:
+                'Bearer' + ' ' + localStorage.getItem('ACCESS_TOKEN'),
+              'Content-Type': 'application/json'
+            }
+          }
+        )
+        const currentData = currentResponse.data
+        this.currentTrack = currentData.item.name
+        this.trackDuration = currentData.item.duration_ms
+        this.totalSeconds = 0
+        this.totalSeconds = currentData.progress_ms
+        this.playing = false
+        this.timer()
+      }, 3000)
+    },
+    async nextTrack() {
+      clearInterval(this.interval)
+      const config = {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('ACCESS_TOKEN')}`,
+          'Content-Type': 'application/json'
+        },
+        data: JSON.stringify({
+          clear_preloaded: 'true',
+          play: 'false'
+        })
+      }
+      await fetch(playerEndpoints.skipToNext, config)
+      setTimeout(async () => {
+        const currentResponse = await axios.get(
+          playerEndpoints.currentlyPlaying,
+          config
+        )
+        const currentData = currentResponse.data
+        this.currentTrack = currentData.item.name
+        this.trackDuration = currentData.item.duration_ms
+        this.totalSeconds = 0
+        this.totalSeconds = currentData.progress_ms
+        this.playing = false
+        this.timer()
+      }, 3000)
+    },
+    async pause() {
+      const config = {
+        method: 'PUT',
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('ACCESS_TOKEN')}`
+        }
+      }
+      await fetch(playerEndpoints.pausePlayback, config)
+      this.playing = true
+      clearInterval(this.interval)
+    },
+    async play() {
+      const config = {
+        method: 'PUT',
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('ACCESS_TOKEN')}`,
+          'Content-Type': 'application/json'
+        }
+      }
+      await fetch(playerEndpoints.startResumePlayback, config)
+      this.playing = false
+      setTimeout(async () => {
+        const currentResponse = await axios.get(
+          playerEndpoints.currentlyPlaying,
+          config
+        )
+        const currentData = currentResponse.data
+        this.currentTrack = currentData.item.name
+        this.trackDuration = currentData.item.duration_ms
+        this.totalSeconds = currentData.progress_ms
+        this.playing = false
+        this.timer()
+      })
+    }
+  },
+  provide() {
+    return {
+      nextTrack: this.nextTrack,
+      prevTrack: this.prevTrack,
+      pause: this.pause,
+      play: this.play
     }
   }
 }
