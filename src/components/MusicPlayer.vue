@@ -17,14 +17,25 @@
     <button class="foward" @click="nextTrack">
       <i class="fas fa-forward"></i>
     </button>
+    <label class="volume">
+      <input type="range"  min="0" max="100" value="25" @change="selected"/>
+      <i class="fas fa-volume-up"></i>
+    </label>
     <p class="name">{{ trackName }}</p>
     <p>{{ msToMinutes(progress) }}</p>
-    <input type="range" min="0" :max="trackDuration" :value="progress" />
+    <input
+      type="range"
+      min="0"
+      :max="trackDuration"
+      :value="progress"
+      class="progress"
+    />
     <p>{{ msToMinutes(trackDuration) }}</p>
   </div>
 </template>
 
 <script>
+import { playerEndpoints } from '@/api/endpoints'
 export default {
   props: {
     trackName: {
@@ -47,7 +58,8 @@ export default {
   inject: ['nextTrack', 'prevTrack', 'pause', 'play'],
   data() {
     return {
-      totalSeconds: 0
+      totalSeconds: 0,
+      value: 25
     }
   },
   methods: {
@@ -55,6 +67,17 @@ export default {
       var minutes = Math.floor(ms / 60000)
       var seconds = ((ms % 60000) / 1000).toFixed(0)
       return minutes + ':' + (seconds < 10 ? '0' : '') + seconds
+    },
+    async selected(event) {
+        const volume = event.target.value
+        const config = {
+            method: 'PUT',
+            headers: {
+                Authorization: 'Bearer' + ' ' + localStorage.getItem('ACCESS_TOKEN'),
+                'Content-Type': 'application/json'
+            }
+        }
+        await fetch(playerEndpoints.setVolume(volume), config)
     }
   }
 }
@@ -69,7 +92,7 @@ export default {
   margin: 10px;
   border-radius: 15px;
   display: grid;
-  grid-template: auto / 0.5fr 1fr 0.5fr;
+  grid-template: auto / 1fr 1fr 1fr 0.2fr;
   color: white;
 }
 
@@ -107,6 +130,7 @@ export default {
   background: rgba(0, 0, 0, 0.3);
   border: none;
   color: white;
+  margin-left: 5px;
 }
 
 .backward:hover {
@@ -136,8 +160,13 @@ p {
 
 input {
   background: rgba(0, 0, 0, 0.2);
+  padding: 0;
+  margin: 0;
+  place-self: center;
 }
-
+.progress {
+  width: 12rem;
+}
 ::-moz-range-progress {
   background: rgb(68, 255, 47);
 }
@@ -152,5 +181,25 @@ input {
   border-radius: 50%;
   background: rgb(27, 254, 2);
   border: none;
+}
+
+.volume {
+  transform: rotate(90deg);
+  display: flex;
+  grid-row: span 2;
+  width: 60px;
+  height: 10px;
+  margin: 0px;
+  place-self: center;
+}
+
+.volume input {
+    width: 60px;
+    transform: rotate(180deg);
+    margin: 2px;
+}
+
+.volume i {
+    margin: 5px;
 }
 </style>
