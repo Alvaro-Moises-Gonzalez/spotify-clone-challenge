@@ -107,7 +107,7 @@ export const checkUserPlaylist = async (id, userId) => {
       }
     }
   )
-  const followPlaylist = followResponse.data
+  const followPlaylist = followResponse.data[0]
   return followPlaylist
 }
 
@@ -138,7 +138,7 @@ export const checkSavedAlbum = async (id) => {
       'Content-Type': 'application/json'
     }
   })
-  const data = response.data
+  const data = response.data[0]
   return data
 }
 

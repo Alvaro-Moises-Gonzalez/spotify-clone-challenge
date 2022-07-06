@@ -283,7 +283,7 @@ watch: {
         case 'playlist':
           this.playlists = [...this.playlists, ...nextData.playlists.items]
           if (nextData.playlists.next) {
-            this.next = nextData.playlits.next
+            this.next = nextData.playlists.next
           } else {
             this.next = undefined
           }
