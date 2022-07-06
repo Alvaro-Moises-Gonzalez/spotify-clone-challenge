@@ -9,6 +9,7 @@ import PlaylistScreen from '@/views/PlaylistScreen.vue'
 import ArtistDetails from '@/views/ArtistDetails'
 import AlbumDetails from '@/views/AlbumDetails.vue'
 import ShowDetails from '@/views/ShowDetails.vue'
+import UserSavedTracksView from '@/views/userSavedTracksView.vue'
 
 const routes = [
   {
@@ -60,6 +61,11 @@ const routes = [
     path: '/show-details/:id',
     name: 'show details',
     component: ShowDetails
+  },
+  {
+    path: '/user-tracks',
+    name: 'user tracks',
+    component: UserSavedTracksView
   }
 ]
 

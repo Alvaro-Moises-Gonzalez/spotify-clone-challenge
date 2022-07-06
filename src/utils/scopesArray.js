@@ -8,6 +8,8 @@ export const scopes = [
   'ugc-image-upload',
   'playlist-read-collaborative',
   'playlist-read-private',
+  'playlist-modify-public',
+  'playlist-modify-private',
   'app-remote-control',
   'streaming',
   'user-modify-playback-state',
