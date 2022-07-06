@@ -1,6 +1,6 @@
 <template>
-  <tr @click=playEpisode>
-    <td>{{ episodeNumber }}</td>
+  <tr>
+    <td class="number">{{ episodeNumber }}</td>
     <td>
       <img v-if="src" class="track-art" :src="src" alt="album art" />
       <img
@@ -9,7 +9,11 @@
         src="@/assets/placeholder.jpg"
         alt="Track art"
       />
-      <p class="title">{{ episode.name }}</p>
+      <p class="title" @click="playEpisode">{{ episode.name }}</p>
+      <button v-if="like" @click="unlikeTrack">
+        <i class="fas fa-heart"></i>
+      </button>
+      <button v-else @click="likeTrack"><i class="far fa-heart"></i></button>
     </td>
     <td class="description">{{ episode.description.slice(0, 30) + '...' }}</td>
     <td>{{ episode.release_date.slice(0, 10) }}</td>
@@ -18,6 +22,7 @@
 </template>
 
 <script>
+import { checkUserEpisodes } from '@/api/callFunctions'
 export default {
   props: {
     episode: {
@@ -29,7 +34,10 @@ export default {
           explicit: false,
           duration_ms: '333333',
           images: ['@/assets/album-placeholder.jpg'],
-          description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.'
+          description:
+            'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
+          uri: '',
+          id: ''
         }
       }
     },
@@ -40,7 +48,8 @@ export default {
   },
   data() {
     return {
-      src: undefined
+      src: undefined,
+      like: false
     }
   },
   methods: {
@@ -49,30 +58,49 @@ export default {
       const seconds = ((ms % 60000) / 1000).toFixed(0)
       return minutes + ':' + (seconds < 10 ? '0' : '') + seconds
     },
-    playEpisode () {
-        this.$emit('playEpisode', this.episodeNumber - 1)
+    toggleLike() {
+      this.like = !this.like
+    },
+    playEpisode() {
+      this.$emit(
+        'playEpisode',
+        this.episode.duration_ms,
+        this.episode.name,
+        this.episode.uri
+      )
+    },
+    likeTrack() {
+      this.toggleLike()
+      this.$emit('like', this.episode.id)
+    },
+    unlikeTrack() {
+      this.toggleLike()
+      this.$emit('unlike', this.episode.id)
     }
   },
-  created() {
+  async created() {
     if (this.episode.images[0]) {
       this.src = this.episode.images[0].url
     } else {
       this.src = undefined
     }
+      this.like = await checkUserEpisodes(this.episode.id)
   }
 }
 </script>
 
-<style>
+<style scoped>
 tr {
   display: table-row;
   color: white;
   font-size: 2rem;
   text-align: center;
   text-transform: capitalize;
-  cursor: pointer;
 }
 
+td {
+  position: relative;
+}
 .track-art {
   width: 50px;
   height: 50px;
@@ -84,4 +112,15 @@ tr {
   font-size: 2rem;
 }
 
+button {
+  position: absolute;
+  left: -20px;
+  top: 10px;
+  width: 50px;
+  height: 50px;
+  font-size: 2.5rem;
+  background-color: transparent;
+  border: none;
+  color: aqua;
+}
 </style>

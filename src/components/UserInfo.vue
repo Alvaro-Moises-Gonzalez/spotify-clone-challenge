@@ -19,6 +19,11 @@
         <span><i class="fas fa-book ico"></i></span>My Playlists
       </button></router-link
     >
+     <router-link :to="{ path: '/user-tracks' }"
+      ><button>
+        <span><i class="fas fa-music"></i></span>My Music
+      </button></router-link
+    >
     <button class="logout-btn" @click="logout">Logout</button>
     <music-player :trackName="trackName" :trackDuration="trackDuration" :isPlaying="isPlaying" :progress="progress"/>
   </div>
@@ -121,7 +126,7 @@ button {
   text-align: left;
   margin-left: 20px;
   color: white;
-  font-size: 2rem;
+  font-size: 1.8rem;
   margin-bottom: 10px;
   border-bottom: 1px solid transparent;
   margin-right: 10px;
@@ -141,6 +146,7 @@ button:hover {
   text-align: center;
   color: white;
   border: 1px solid transparent;
+  margin-bottom: 0px;
 }
 .logout-btn:hover {
   border: 1px solid aqua;

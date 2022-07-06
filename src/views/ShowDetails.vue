@@ -6,11 +6,17 @@
         :isPlaying="playing"
         :progress="totalSeconds"
         :trackDuration="trackDuration"
-        :trackName="currentTrack"
+        :trackName="trackName"
       />
     </template>
     <template #upper>
-      <show-thumbnail :show="show" :src="src" :playShow="playShow" />
+      <show-thumbnail
+        :show="show"
+        :src="src"
+        :playShow="playShow"
+        @follow="follow"
+        @unfollow="unfollow"
+      />
     </template>
     <template #bottom>
       <table>
@@ -29,6 +35,8 @@
             :episodeNumber="index + 1"
             :episode="episode"
             @playEpisode="playEpisode"
+            @like="like"
+            @unlike="unlike"
           />
         </transition-group>
         <button v-if="next" @click="nextEpisodes" class="more-episodes">
@@ -47,7 +55,23 @@ import EpisodeRow from '@/components/EpisodeRow.vue'
 import axios from 'axios'
 import gsap from 'gsap'
 
-import { playerEndpoints, showsEndpoints, userEndpoints } from '@/api/endpoints'
+import { showsEndpoints } from '@/api/endpoints'
+import {
+  followShow,
+  removeUserEpisode,
+  saveUserEpisode,
+  userData,
+  unfollowShow
+} from '@/api/callFunctions'
+import {
+  resume,
+  nextElement,
+  prevElement,
+  pauseElement,
+  playElement,
+  playCollection,
+  currentSong
+} from '@/api/playercontrols'
 
 export default {
   components: {
@@ -56,19 +80,31 @@ export default {
     UserInfo,
     EpisodeRow
   },
-  async created() {
-    const id = this.$route.params.id
-    const config = {
-      headers: {
-        Authorization: 'Bearer' + ' ' + localStorage.getItem('ACCESS_TOKEN'),
-        'Content-Type': 'application/json'
+  watch: {
+    async totalSeconds(oldVal) {
+      if (oldVal >= this.trackDuration) {
+        clearInterval(this.interval)
+        setTimeout(async () => {
+          const currentTrack = await currentSong(this.config)
+          this.trackName = currentTrack.item.name
+          this.trackDuration = currentTrack.item.duration_ms
+          this.totalSeconds = 0
+          this.totalSeconds = currentTrack.progress_ms
+          this.playing = false
+          this.timer()
+        }, 1000)
       }
     }
+  },
+  async created() {
+    const id = this.$route.params.id
 
-    const userInfoResponse = await axios.get(userEndpoints.currentUser, config)
-    this.userInfo = userInfoResponse.data
+    this.userInfo = await userData(this.config)
 
-    const showResponse = await axios.get(showsEndpoints.getShow(id), config)
+    const showResponse = await axios.get(
+      showsEndpoints.getShow(id),
+      this.config
+    )
     this.show = showResponse.data
     this.showUri = showResponse.data.uri
 
@@ -78,7 +114,7 @@ export default {
 
     const episodesResponse = await axios.get(
       showsEndpoints.getEpisodes(id),
-      config
+      this.config
     )
     this.episodesUris = episodesResponse.data.items.map(
       (episode) => episode.uri
@@ -87,15 +123,12 @@ export default {
     if (episodesResponse.data.next) {
       this.next = episodesResponse.data.next
     }
-    const currentResponse = await axios.get(
-      playerEndpoints.currentlyPlaying,
-      config
-    )
-    const currentData = currentResponse.data
-    this.currentTrack = currentData.item.name
-    this.trackDuration = currentData.item.duration_ms
-    this.totalSeconds = currentData.progress_ms
-    if (currentData.is_playing == true) {
+
+    const currentTrack = await currentSong(this.config)
+    this.trackName = currentTrack.item.name
+    this.trackDuration = currentTrack.item.duration_ms
+    this.totalSeconds = currentTrack.progress_ms
+    if (currentTrack.is_playing == true) {
       this.playing = false
       this.timer()
     }
@@ -109,11 +142,17 @@ export default {
       next: undefined,
       showUri: undefined,
       episodesUris: undefined,
-      currentTrack: '',
+      trackName: '',
       trackDuration: 0,
       playing: true,
       totalSeconds: 0,
-      interval: undefined
+      interval: undefined,
+      config: {
+        headers: {
+          Authorization: 'Bearer' + ' ' + localStorage.getItem('ACCESS_TOKEN'),
+          'Content-Type': 'application/json'
+        }
+      }
     }
   },
   methods: {
@@ -147,63 +186,27 @@ export default {
     },
     async playShow() {
       const uri = this.showUri
-      const config = {
-        method: 'PUT',
-        headers: {
-          Authorization: 'Bearer' + ' ' + localStorage.getItem('ACCESS_TOKEN'),
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          context_uri: `${uri}`,
-          offset: {
-            position: '0'
-          },
-          position_ms: '0'
-        })
-      }
-      await fetch(playerEndpoints.startResumePlayback, config)
       clearInterval(this.interval)
+      playCollection(uri)
+      this.playing = false
       setTimeout(async () => {
-        const currentResponse = await axios.get(
-          playerEndpoints.currentlyPlaying,
-          config
-        )
-        const currentData = currentResponse.data
-        this.currentTrack = currentData.item.name
-        this.trackDuration = currentData.item.duration_ms
-        this.totalSeconds = currentData.progress_ms
-        this.playing = false
-        this.timer()
-      }, 2000)
-    },
-    async playEpisode(number) {
-      const config = {
-        method: 'PUT',
-        headers: {
-          Authorization: 'Bearer' + ' ' + localStorage.getItem('ACCESS_TOKEN'),
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          uris: this.episodesUris,
-          offset: {
-            position: `${number}`
-          },
-          position_ms: '0'
-        })
-      }
-      await fetch(playerEndpoints.startResumePlayback, config)
-      clearInterval(this.interval)
-      setTimeout(async () => {
-        const currentResponse = await axios.get(
-          playerEndpoints.currentlyPlaying,
-          config
-        )
-        const currentData = currentResponse.data
-        this.currentTrack = currentData.item.name
-        this.trackDuration = currentData.item.duration_ms
+        const currentTrack = await currentSong(this.config)
+        this.trackDuration = currentTrack.duration_ms
         this.totalSeconds = 0
-        this.totalSeconds = currentData.progress_ms
-        this.playing = false
+        this.totalSeconds = currentTrack.progress_ms
+        this.timer()
+      }, 3000)
+    },
+    async playEpisode(duration, name, uri) {
+      clearInterval(this.interval)
+      playElement(0, [uri])
+      this.playing = false
+      setTimeout(async () => {
+        const currentTrack = await currentSong(this.config)
+        this.trackDuration = duration
+        this.trackName = name
+        this.totalSeconds = 0
+        this.totalSeconds = currentTrack.progress_ms
         this.timer()
       }, 3000)
     },
@@ -214,94 +217,38 @@ export default {
       this.interval = setInterval(addSeconds, 100)
     },
     async prevTrack() {
-      clearInterval(this.interval)
-      await fetch(playerEndpoints.skiptoPrevius, {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('ACCESS_TOKEN')}`
-        }
-      })
-      setTimeout(async () => {
-        const currentResponse = await axios.get(
-          playerEndpoints.currentlyPlaying,
-          {
-            headers: {
-              Authorization:
-                'Bearer' + ' ' + localStorage.getItem('ACCESS_TOKEN'),
-              'Content-Type': 'application/json'
-            }
-          }
-        )
-        const currentData = currentResponse.data
-        this.currentTrack = currentData.item.name
-        this.trackDuration = currentData.item.duration_ms
-        this.totalSeconds = 0
-        this.totalSeconds = currentData.progress_ms
-        this.playing = false
-        this.timer()
-      }, 3000)
+      return
     },
     async nextTrack() {
-      clearInterval(this.interval)
-      const config = {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('ACCESS_TOKEN')}`,
-          'Content-Type': 'application/json'
-        },
-        data: JSON.stringify({
-          clear_preloaded: 'true',
-          play: 'false'
-        })
-      }
-      await fetch(playerEndpoints.skipToNext, config)
-      setTimeout(async () => {
-        const currentResponse = await axios.get(
-          playerEndpoints.currentlyPlaying,
-          config
-        )
-        const currentData = currentResponse.data
-        this.currentTrack = currentData.item.name
-        this.trackDuration = currentData.item.duration_ms
-        this.totalSeconds = 0
-        this.totalSeconds = currentData.progress_ms
-        this.playing = false
-        this.timer()
-      }, 3000)
+      return
     },
     async pause() {
-      const config = {
-        method: 'PUT',
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('ACCESS_TOKEN')}`
-        }
-      }
-      await fetch(playerEndpoints.pausePlayback, config)
-      this.playing = true
       clearInterval(this.interval)
+      pauseElement()
+      this.playing = true
     },
     async play() {
-      const config = {
-        method: 'PUT',
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('ACCESS_TOKEN')}`,
-          'Content-Type': 'application/json'
-        }
-      }
-      await fetch(playerEndpoints.startResumePlayback, config)
+      resume()
       this.playing = false
       setTimeout(async () => {
-        const currentResponse = await axios.get(
-          playerEndpoints.currentlyPlaying,
-          config
-        )
-        const currentData = currentResponse.data
-        this.currentTrack = currentData.item.name
-        this.trackDuration = currentData.item.duration_ms
-        this.totalSeconds = currentData.progress_ms
+        const currentTrack = await currentSong(this.config)
+        this.totalSeconds = 0
+        this.totalSeconds = currentTrack.progress_ms
         this.playing = false
         this.timer()
       })
+    },
+    async follow(id) {
+      await followShow(id)
+    },
+    async unfollow(id) {
+      await unfollowShow(id)
+    },
+    async like(id) {
+      await saveUserEpisode(id)
+    },
+    async unlike(id) {
+      await removeUserEpisode(id)
     }
   },
   provide() {

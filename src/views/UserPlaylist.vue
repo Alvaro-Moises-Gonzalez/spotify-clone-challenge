@@ -5,7 +5,7 @@
         :userInfo="userInfo"
         :isPlaying="playing"
         :trackDuration="trackDuration"
-        :trackName="currentTrack"
+        :trackName="trackName"
         :progress="totalSeconds"
       />
     </template>
@@ -29,12 +29,14 @@
 import LayoutScreen from '@/Layout/LayoutScreen.vue'
 import PlaylistCard from '@/components/PlaylistCard.vue'
 import UserInfo from '@/components/UserInfo.vue'
-import axios from 'axios'
+import { userData, playlists } from '@/api/callFunctions'
 import {
-  playlistEndpoints,
-  userEndpoints,
-  playerEndpoints
-} from '@/api/endpoints'
+  resume,
+  nextElement,
+  prevElement,
+  pauseElement,
+  currentSong
+} from '@/api/playercontrols'
 import gsap from 'gsap'
 export default {
   components: {
@@ -46,11 +48,17 @@ export default {
     return {
       userPlaylists: [],
       userInfo: undefined,
-      currentTrack: '',
+      trackName: '',
       trackDuration: 0,
       playing: true,
       totalSeconds: 0,
-      interval: undefined
+      interval: undefined,
+      config: {
+        headers: {
+          Authorization: 'Bearer' + ' ' + localStorage.getItem('ACCESS_TOKEN'),
+          'Content-Type': 'application/json'
+        }
+      }
     }
   },
   watch: {
@@ -58,22 +66,11 @@ export default {
       if (oldVal >= this.trackDuration) {
         clearInterval(this.interval)
         setTimeout(async () => {
-          const config = {
-            headers: {
-              Authorization:
-                'Bearer' + ' ' + localStorage.getItem('ACCESS_TOKEN'),
-              'Content-Type': 'application/json'
-            }
-          }
-          const currentResponse = await axios.get(
-            playerEndpoints.currentlyPlaying,
-            config
-          )
-          const currentData = currentResponse.data
-          this.currentTrack = currentData.item.name
-          this.trackDuration = currentData.item.duration_ms
+          const currentTrack = await currentSong(this.config)
+          this.trackName = currentTrack.item.name
+          this.trackDuration = currentTrack.item.duration_ms
           this.totalSeconds = 0
-          this.totalSeconds = currentData.progress_ms
+          this.totalSeconds = currentTrack.progress_ms
           this.playing = false
           this.timer()
         }, 1000)
@@ -102,120 +99,60 @@ export default {
     },
     async prevTrack() {
       clearInterval(this.interval)
-      await fetch(playerEndpoints.skiptoPrevius, {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('ACCESS_TOKEN')}`
-        }
-      })
+      prevElement()
+      this.playing = false
       setTimeout(async () => {
-        const currentResponse = await axios.get(
-          playerEndpoints.currentlyPlaying,
-          {
-            headers: {
-              Authorization:
-                'Bearer' + ' ' + localStorage.getItem('ACCESS_TOKEN'),
-              'Content-Type': 'application/json'
-            }
-          }
-        )
-        const currentData = currentResponse.data
-        this.currentTrack = currentData.item.name
-        this.trackDuration = currentData.item.duration_ms
+        const currentTrack = await currentSong(this.config)
+        this.trackName = currentTrack.item.name
+        this.trackDuration = currentTrack.item.duration_ms
         this.totalSeconds = 0
-        this.totalSeconds = currentData.progress_ms
-        this.playing = false
+        this.totalSeconds = currentTrack.progress_ms
         this.timer()
       }, 3000)
     },
     async nextTrack() {
       clearInterval(this.interval)
-      const config = {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('ACCESS_TOKEN')}`,
-          'Content-Type': 'application/json'
-        },
-        data: JSON.stringify({
-          clear_preloaded: 'true',
-          play: 'false'
-        })
-      }
-      await fetch(playerEndpoints.skipToNext, config)
+      nextElement()
+      this.playing = false
       setTimeout(async () => {
-        const currentResponse = await axios.get(
-          playerEndpoints.currentlyPlaying,
-          config
-        )
-        const currentData = currentResponse.data
-        this.currentTrack = currentData.item.name
-        this.trackDuration = currentData.item.duration_ms
+        const currentTrack = await currentSong(this.config)
+        this.trackName = currentTrack.item.name
+        this.trackDuration = currentTrack.item.duration_ms
         this.totalSeconds = 0
-        this.totalSeconds = currentData.progress_ms
-        this.playing = false
+        this.totalSeconds = currentTrack.progress_ms
         this.timer()
       }, 3000)
     },
     async pause() {
-      const config = {
-        method: 'PUT',
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('ACCESS_TOKEN')}`
-        }
-      }
-      await fetch(playerEndpoints.pausePlayback, config)
-      this.playing = true
       clearInterval(this.interval)
+      pauseElement()
+      this.playing = true
     },
     async play() {
-      const config = {
-        method: 'PUT',
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('ACCESS_TOKEN')}`,
-          'Content-Type': 'application/json'
-        }
-      }
-      await fetch(playerEndpoints.startResumePlayback, config)
+      resume()
       this.playing = false
       setTimeout(async () => {
-        const currentResponse = await axios.get(
-          playerEndpoints.currentlyPlaying,
-          config
-        )
-        const currentData = currentResponse.data
-        this.currentTrack = currentData.item.name
-        this.trackDuration = currentData.item.duration_ms
-        this.totalSeconds = currentData.progress_ms
+        const currentTrack = await currentSong(this.config)
+        this.trackName = currentTrack.item.name
+        this.trackDuration = currentTrack.item.duration_ms
+        this.totalSeconds = 0
+        this.totalSeconds = currentTrack.progress_ms
         this.playing = false
         this.timer()
       })
     }
   },
   async created() {
-    const config = {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem('ACCESS_TOKEN')}`,
-        'Content-type': 'application/json'
-      }
-    }
-    const userInfoResponse = await axios.get(userEndpoints.currentUser, config)
-    this.userInfo = userInfoResponse.data
-    const playlistResponse = await axios.get(
-      playlistEndpoints.userPlaylists,
-      config
-    )
-    const playlistData = playlistResponse.data
+    this.userInfo = await userData(this.config)
+
+    const playlistData = await playlists(this.config)
     this.userPlaylists = playlistData.items
 
-    const currentResponse = await axios.get(
-      playerEndpoints.currentlyPlaying,
-      config
-    )
-    const currentData = currentResponse.data
-    this.currentTrack = currentData.item.name
-    this.trackDuration = currentData.item.duration_ms
-    this.totalSeconds = currentData.progress_ms
-    if (currentData.is_playing == true) {
+    const currentTrack = await currentSong(this.config)
+    this.trackName = currentTrack.item.name
+    this.trackDuration = currentTrack.item.duration_ms
+    this.totalSeconds = currentTrack.progress_ms
+    if (currentTrack.is_playing == true) {
       this.playing = false
       this.timer()
     }
